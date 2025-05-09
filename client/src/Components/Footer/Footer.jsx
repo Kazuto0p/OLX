@@ -1,25 +1,30 @@
 import React from 'react';
+import './FooterTailwind.css'
+// import '/home/synnefo/OLX/client/tailwind.config.js'
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-100 border-t border-gray-200 py-6">
-      <div className="max-w-6xl mx-auto px-4 flex flex-wrap justify-between gap-4">
-        {/* Quick Links Section */}
-        <div className="flex-1 min-w-[200px]">
-          <h4 className="text-lg font-bold text-gray-700 mb-2">Quick Links</h4>
-          <ul className="space-y-2">
-            <li><a href="#" className="text-gray-600 hover:underline">Home</a></li>
-            <li><a href="#" className="text-gray-600 hover:underline">About</a></li>
-            <li><a href="#" className="text-gray-600 hover:underline">Contact</a></li>
-          </ul>
+    <footer className="bg-[rgb(0,_72,_150)] border-t border-gray-200 py-6 h-auto p-16">
+      <div className="flex justify-between w-full gap-x-8">
+        <div className="flex-[2] p-4 flex items-center border-r border-white">
+          <img
+            className="w-full h-full object-cover"
+            src="src/assets/images/cartrade_tech_1.svg"
+            alt="Logo"
+          />
         </div>
-
-        {/* Copyright Section */}
-        <div className="flex-1 min-w-[200px] text-gray-600 text-sm">
-          <p>© 2025 Your Company. All rights reserved.</p>
-        </div>
+        <div className="flex-1 p-4 items-center"><img className="w-full h-full object-contain" src="src/assets/images/olx_2025.svg" alt="" srcset="" /></div>
+        <div className="flex-1 p-4 items-center"><img className="w-full h-full object-contain" src="src/assets/images/carwale.svg" alt="" srcset="" /></div>
+        <div className="flex-1 p-4 items-center"><img className="w-full h-full object-contain" src="src/assets/images/bikewale.svg" alt="" srcset="" /></div>
+        <div className="flex-1 p-4 items-center"><img className="w-full h-full object-contain" src="src/assets/images/cartrade.svg" alt="" srcset="" /></div>
+        <div className="flex-1 p-4 items-center"><img className="w-full h-full object-contain" src="src/assets/images/mobility.svg" alt="" srcset="" /></div>
+      </div>
+      <div className='flex justify-between text-white' >
+        <div className=' text-[12px] '>Help - Sitemap</div>
+        <div className=' text-[12px] '>All rights reserved © 2006-2025 OLX</div>
       </div>
     </footer>
+
   );
 };
 

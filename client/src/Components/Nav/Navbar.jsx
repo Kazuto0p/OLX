@@ -1,19 +1,30 @@
-import React, { useState } from 'react';
-import './Navbar.css';
+import React, { useState } from "react";
+import "./Navbar.css";
 
 const Navbar = () => {
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  const toggleProfileDropdown = () => {
+    setIsProfileOpen(!isProfileOpen);
+  };
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isProfileOpen,setIsProfileOpen] = useState(false)
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
-
   const categories = [
     {
       title: "Cars",
-      items: ["Cars", "Bikes", "Motorcycles", "Scooters", "Bicycle", "Spare Parts"],
+      items: [
+        "Cars",
+        "Bikes",
+        "Motorcycles",
+        "Scooters",
+        "Bicycle",
+        "Spare Parts",
+      ],
     },
     {
       title: "Properties",
@@ -75,7 +86,12 @@ const Navbar = () => {
     },
     {
       title: "Pets",
-      items: ["Fishes & Aquarium", "Pet Food & Accessories", "Dogs", "Other Pets"],
+      items: [
+        "Fishes & Aquarium",
+        "Pet Food & Accessories",
+        "Dogs",
+        "Other Pets",
+      ],
     },
     {
       title: "Services",
@@ -125,7 +141,6 @@ const Navbar = () => {
           </div>
         </div>
 
-    
         <div className="nav-search">
           <div className="search-container">
             <input type="text" placeholder='Search "Cars"' />
@@ -181,26 +196,128 @@ const Navbar = () => {
               ></path>
             </svg>
           </button>
-          <div className="profile-container">
-            <span className="profile-badge">S</span>
-            <svg
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-              ></path>
-            </svg>
+
+          <div className="profile-section" onClick={toggleProfileDropdown}>
+            <img
+              src={`src/assets/react.svg`}
+              alt="Profile"
+              className="profile-pic"
+            />
+
+            {isProfileOpen && (
+              <div className="profile-dropdown">
+                <div id="BORD">
+                  <div className="sidebar-content">
+                    <div className="profile-section">
+                      <img
+                        src={`src/assets/react.svg`}
+                        alt="Profile"
+                        className="profile-pic"
+                      />
+                      <span className="username">Synnefo</span>
+                    </div>
+                    <button id="vep">View and edit profile</button>
+                  </div>
+                </div>
+                {/* <div id='BORD'>
+                  <div className="sidebar-content">
+                    <div className="profile-section1">
+                      <img
+                        src={`src/assets/react.svg`}
+                        alt="Profile"
+                        className="profile-pic"
+                      />
+                      <span className="username">Synnefo</span>
+
+                    </div>
+                    <button id='vep'>View and edit profile</button>
+                  </div>
+                </div> */}
+
+                <div className="profile-section1">
+                  <div className="BORD">
+                    <div style={{ display: "flex", gap: "14%", width: "100%" }}>
+                      <img
+                        src={`src/assets/icons/icon_1.svg`}
+                        alt="Profile"
+                        className="profile-pic1"
+                      />
+                      <span className="username">My ADS</span>
+                    </div>{" "}
+                    <br />
+                    <div style={{ display: "flex", gap: "14%", width: "100%" }}>
+                      <img
+                        src={`src/assets/icons/icon_5.svg`}
+                        alt="Profile"
+                        className="profile-pic1"
+                      />
+                      <span className="username">Buy Business Packages</span>
+                    </div>{" "}
+                    <br />
+                    <div style={{ display: "flex", gap: "14%", width: "100%" }}>
+                      <img
+                        src={`src/assets/icons/card.png`}
+                        alt="Profile"
+                        className="profile-pic1"
+                      />
+                      <span className="username">
+                        Bought Packages & Billing
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="profile-section1">
+                  <div className="BORD">
+                    <div style={{ display: "flex", gap: "14%", width: "100%" }}>
+                      <img
+                        src={`src/assets/icons/question.png`}
+                        alt="Profile"
+                        className="profile-pic1"
+                      />
+                      <span className="username">Help</span>
+                    </div>{" "}
+                    <br />
+                    <div style={{ display: "flex", gap: "14%", width: "100%" }}>
+                      <img
+                        src={`src/assets/icons/gear.png`}
+                        alt="Profile"
+                        className="profile-pic1"
+                      />
+                      <span className="username">Settings</span>
+                    </div>{" "}
+                    <br />
+                    <div style={{ display: "flex", gap: "14%", width: "100%" }}>
+                      <img
+                        src={`src/assets/icons/left-arrow.png`}
+                        alt="Profile"
+                        className="profile-pic1"
+                      />
+                      <span className="username">Logout</span>
+                    </div>
+                  </div>
+                  <div></div>
+                </div>
+                
+              </div>
+            )}
           </div>
+
           <button className="sell-button">
-            <svg width="100" height="40" viewBox="0 0 100 40" preserveAspectRatio="none">
+            <svg
+              width="100"
+              height="40"
+              viewBox="0 0 100 40"
+              preserveAspectRatio="none"
+            >
               <defs>
-                <linearGradient id="splitBorder" x1="0%" y1="0%" x2="100%" y2="0%">
+                <linearGradient
+                  id="splitBorder"
+                  x1="0%"
+                  y1="0%"
+                  x2="100%"
+                  y2="0%"
+                >
                   <stop offset="50%" stopColor="#facc15" />
                   <stop offset="50%" stopColor="#1e40af" />
                 </linearGradient>
@@ -222,7 +339,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Bottom Section: Category Tabs */}
       <div className="nav-bottom">
         <div className="category-dropdown">
           <button onClick={toggleDropdown} className="category-button">
@@ -243,7 +359,6 @@ const Navbar = () => {
             </svg>
           </button>
 
-          {/* Dropdown Menu */}
           {isDropdownOpen && (
             <div className="dropdown-menu">
               <div className="dropdown-content">
@@ -264,7 +379,6 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* Existing Category Buttons */}
         <button>Cars</button>
         <button>Motorcycles</button>
         <button>Mobile Phones</button>

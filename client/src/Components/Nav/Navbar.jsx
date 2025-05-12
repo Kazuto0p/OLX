@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./Navbar.css";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -13,6 +14,7 @@ const Navbar = () => {
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
+  const navigate = useNavigate()
 
   const categories = [
     {
@@ -303,7 +305,7 @@ const Navbar = () => {
             )}
           </div>
 
-          <button className="sell-button">
+          <button className="sell-button " onClick={()=>navigate("/sell")}>
             <svg
               width="100"
               height="40"

@@ -1,0 +1,525 @@
+import React from 'react'
+
+const Post = () => {
+      const [selectedCategory, setSelectedCategory] = useState(null);
+  
+      const toggleCategory = (category) => {
+  
+          setSelectedCategory(selectedCategory === category ? null : category);
+      };
+  
+  
+      const subcategories = {
+          Cars: ['Cars'],
+          Mobiles: ['MobilPhones', 'Accessories','Tablets'],
+          'Electronics & Appliances': [
+              'TVs,Video- Audio',
+              'Kitchen & Other Appliances',
+              'Computers & Laptops',
+              'Cameras & Lenses',
+              'Games & Entertainment',
+              'Fridges',
+              'Computer Accessories',
+              'Hard Disks, Printers & Monitors',
+              'ACs',
+              'Washing Machines',
+          ],
+      };
+  return (
+    <div>
+                <h2 className="text-[24px] font-bold text-center">POST YOUR AD</h2>
+            </div>
+            <div className="w-[852px] h-180 mx-auto border">
+                <div className="w-[851px] h-15 mx-auto flex items-center pt-6 pr-[30px] pb-4 pl-[30px] border-r border-b-0">
+                    CHOOSE A CATEGORY
+                </div>
+                <div className="flex ">
+                    <div className="h-90 w-[425.5px] flex justify-start border-t border-r border-b border-l-0">
+                        <ul className="w-[100%] h-100">
+                            <li
+                                className="border-b flex items-center text-[#8d9094] hover-fill-[#020812] p-[10px] fill-[#8d9094]"
+                                onClick={() => toggleCategory('Cars')}
+                            >
+                                <svg
+                                    width="30px"
+                                    height="30px"
+                                    viewBox="0 0 1024 1024"
+                                    data-aut-id="icon"
+                                    fillRule="evenodd"
+                                >
+                                    <path
+                                        className="rui-UJ1uk"
+                                        d="M744.747 124.16l38.4 33.28 36.949 258.731 107.221 107.179 11.349 27.435v193.963l-38.827 38.784h-38.741v116.352h-77.568v-116.352h-543.061v116.352h-77.568v-116.352h-38.741l-38.827-38.827v-193.877l11.349-27.435 107.264-107.221 36.949-258.731 38.4-33.28h465.493zM768.555 474.325h-513.109l-92.544 92.501v139.093h698.197v-139.093l-92.544-92.501zM298.667 550.784c32.128 0 58.197 26.027 58.197 58.197 0 32.128-26.027 58.155-58.197 58.155-32.128 0-58.197-26.027-58.197-58.155s26.027-58.197 58.197-58.197zM725.333 550.784c32.128 0 58.197 26.027 58.197 58.197 0 32.128-26.027 58.155-58.197 58.155-32.128 0-58.197-26.027-58.197-58.155s26.027-58.197 58.197-58.197zM711.083 201.685h-398.165l-27.904 195.115h453.888l-27.861-195.072z"
+                                    />
+                                </svg>
+                                <p className="flex-grow text-[16px] p-[8px]">Cars</p>
+                                <svg
+                                    width="25px"
+                                    height="25px"
+                                    viewBox="0 0 1024 1024"
+                                    data-aut-id="icon"
+                                    fillRule="evenodd"
+                                >
+                                    <path
+                                        className="rui-UJ1uk"
+                                        d="M277.333 85.333v60.331l366.336 366.336-366.336 366.336v60.331h60.331l409.003-408.981v-35.307l-409.003-409.045z"
+                                    />
+                                </svg>
+                            </li>
+                            <li
+                                className="border-b flex items-center text-[#8d9094] hover-fill-[#020812] p-[10px] fill-[#8d9094]"
+                                onClick={() => toggleCategory('Mobiles')}
+                            >
+                                <svg
+                                    width="30px"
+                                    height="30px"
+                                    viewBox="0 0 1024 1024"
+                                    data-aut-id="icon"
+                                    fillRule="evenodd"
+                                >
+                                    <path
+                                        className="rui-UJ1uk"
+                                        d="M743.68 85.333l66.987 67.84v701.227l-63.573 84.267h-471.253l-62.507-85.333v-700.373l67.627-67.627h462.72zM708.053 170.667h-391.893l-17.493 17.707v637.653l20.053 27.307h385.92l21.333-27.52v-637.653l-17.92-17.493zM512 682.667c23.564 0 42.667 19.103 42.667 42.667s-19.103 42.667-42.667 42.667c-23.564 0-42.667-19.103-42.667-42.667s19.103-42.667 42.667-42.667z"
+                                    />
+                                </svg>
+                                <p className="flex-grow text-[16px] p-[8px]">Mobiles</p>
+                                <svg
+                                    width="25px"
+                                    height="25px"
+                                    viewBox="0 0 1024 1024"
+                                    data-aut-id="icon"
+                                    fillRule="evenodd"
+                                >
+                                    <path
+                                        className="rui-UJ1uk"
+                                        d="M277.333 85.333v60.331l366.336 366.336-366.336 366.336v60.331h60.331l409.003-408.981v-35.307l-409.003-409.045z"
+                                    />
+                                </svg>
+                            </li>
+                            <li
+                                className="border-b flex items-center text-[#8d9094] hover-fill-[#020812] p-[10px] fill-[#8d9094]"
+                                onClick={() => toggleCategory('Electronics & Appliances')}
+                            >
+                                <svg
+                                    width="30px"
+                                    height="30px"
+                                    viewBox="0 0 1024 1024"
+                                    data-aut-id="icon"
+                                    fillRule="evenodd"
+                                >
+                                    <path
+                                        className="rui-UJ1uk"
+                                        d="M149.76 128l-64.427 62.848v480.853l69.333 67.84h317.781l0.725 75.477h-169.6v80.981h416.128v-80.981h-161.621l-0.683-75.435h315.648l65.621-68.693v-482.389l-75.733-60.501h-713.173zM170.24 638.72v-414.848l15.232-14.848h646.656l21.632 17.28v413.184l-18.176 19.072h-645.12l-20.224-19.84z"
+                                    />
+                                </svg>
+                                <p className="flex-grow text-[16px] p-[8px]">Electronics & Appliances</p>
+                                <svg
+                                    width="25px"
+                                    height="25px"
+                                    viewBox="0 0 1024 1024"
+                                    data-aut-id="icon"
+                                    fillRule="evenodd"
+                                >
+                                    <path
+                                        className="rui-UJ1uk"
+                                        d="M277.333 85.333v60.331l366.336 366.336-366.336 366.336v60.331h60.331l409.003-408.981v-35.307l-409.003-409.045z"
+                                    />
+                                </svg>
+                            </li>
+                        </ul>
+                    </div>
+                    <div className="h-90 w-[425.5px] ">
+                        {selectedCategory && (
+                            <ul>
+                                {subcategories[selectedCategory].map((subcategory, index) => (
+                                    <li
+                                        key={index}
+                                        className="border-b flex items-center text-[#8d9094] p-[10px] hover:bg-gray-100"
+                                    >
+                                        <p className="flex-grow text-[16px] p-[8px]">{subcategory}</p>
+                                        <svg
+                                            width="25px"
+                                            height="25px"
+                                            viewBox="0 0 1024 1024"
+                                            data-aut-id="icon"
+                                            fillRule="evenodd"
+                                        >
+                                            <path
+                                                className="rui-UJ1uk"
+                                                d="M277.333 85.333v60.331l366.336 366.336-366.336 366.336v60.331h60.331l409.003-408.981v-35.307l-409.003-409.045z"
+                                            />
+                                        </svg>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+                </div>
+            </div>
+  )
+}
+
+export default Post
+
+
+
+
+
+
+import React, { useState } from 'react';
+
+const PostCarAdPage = () => {
+    const [brand, setBrand] = useState('');
+    const [year, setYear] = useState('');
+    const [fuel, setFuel] = useState('');
+    const [transmission, setTransmission] = useState('');
+    const [kmDriven, setKmDriven] = useState('');
+    const [owners, setOwners] = useState('');
+    const [adTitle, setAdTitle] = useState('');
+    const [description, setDescription] = useState('');
+    const [price, setPrice] = useState('');
+    const [location, setLocation] = useState('');
+    const [photos, setPhotos] = useState([]);
+    const [errors, setErrors] = useState({});
+
+    const validateForm = () => {
+        const newErrors = {};
+        if (!brand) newErrors.brand = 'Brand is required';
+        if (!year) newErrors.year = 'Year is required';
+        if (!fuel) newErrors.fuel = 'Fuel type is required';
+        if (!transmission) newErrors.transmission = 'Transmission type is required';
+        if (!kmDriven) newErrors.kmDriven = 'KM Driven is required';
+        if (!owners) newErrors.owners = 'Number of owners is required';
+        if (!adTitle) newErrors.adTitle = 'Ad title is required';
+        if (!description) newErrors.description = 'Description is required';
+        if (!price) newErrors.price = 'Price is required';
+        if (!location) newErrors.location = 'Location is required';
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handlePhotoUpload = (e) => {
+        const files = Array.from(e.target.files);
+        const validFiles = files.filter(file => {
+            const isImage = file.type.startsWith('image/');
+            const isUnderSize = file.size <= 5 * 1024 * 1024; // 5MB limit
+            return isImage && isUnderSize;
+        });
+        setPhotos([...photos, ...validFiles].slice(0, 20)); // Limit to 20 photos
+    };
+
+    const removePhoto = (index) => {
+        setPhotos(photos.filter((_, i) => i !== index));
+    };
+
+    const handleSubmit = () => {
+        if (validateForm()) {
+            alert('Ad posted successfully!');
+            // Reset form (optional)
+            setBrand('');
+            setYear('');
+            setFuel('');
+            setTransmission('');
+            setKmDriven('');
+            setOwners('');
+            setAdTitle('');
+            setDescription('');
+            setPrice('');
+            setLocation('');
+            setPhotos([]);
+            setErrors({});
+        }
+    };
+
+    const isFormValid = brand && year && fuel && transmission && kmDriven && owners && adTitle && description && price && location;
+
+    return (
+        <div className="max-w-[852px] w-full mx-auto border rounded-lg shadow-md bg-gray-50">
+            {/* Header */}
+            <div className="bg-blue-600 text-white">
+                <h2 className="text-[28px] sm:text-[24px] font-bold text-center py-4">POST YOUR AD</h2>
+            </div>
+
+            {/* Selected Category */}
+            <div className="border-b border-gray-200 bg-white">
+                <div className="max-w-[851px] w-full mx-auto flex items-center py-4 px-[20px] sm:px-[10px]">
+                    <p className="text-[16px] sm:text-[14px] text-gray-600">Cars</p>
+                    <a href="#" className="ml-auto text-[14px] sm:text-[12px] text-blue-600 hover:underline">
+                        Change
+                    </a>
+                </div>
+            </div>
+
+            {/* Include Some Details */}
+            <div className="border-b border-gray-200 bg-white">
+                <div className="max-w-[851px] w-full mx-auto py-6 px-[20px] sm:px-[10px]">
+                    <h3 className="text-[20px] sm:text-[18px] font-semibold mb-4 text-gray-800">Include Some Details</h3>
+                    <div className="mb-4">
+                        <label className="block text-[14px] sm:text-[13px] font-medium text-gray-700 mb-1">Brand *</label>
+                        <select
+                            value={brand}
+                            onChange={(e) => setBrand(e.target.value)}
+                            className={`w-full border rounded-lg p-2 text-[16px] sm:text-[14px] text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                                errors.brand ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                        >
+                            <option value="">Select Brand</option>
+                            <option value="Toyota">Toyota</option>
+                            <option value="Honda">Honda</option>
+                            <option value="Ford">Ford</option>
+                        </select>
+                        {errors.brand && <p className="text-[12px] text-red-500 mt-1">{errors.brand}</p>}
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-[14px] sm:text-[13px] font-medium text-gray-700 mb-1">Year *</label>
+                        <input
+                            type="number"
+                            value={year}
+                            onChange={(e) => setYear(e.target.value)}
+                            min="1900"
+                            max="2025"
+                            className={`w-full border rounded-lg p-2 text-[16px] sm:text-[14px] text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                                errors.year ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                            placeholder="Enter year (e.g., 2022)"
+                        />
+                        {errors.year && <p className="text-[12px] text-red-500 mt-1">{errors.year}</p>}
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-[14px] font-medium text-gray-600 mb-2">Fuel *</label>
+                        <div className="flex gap-3 flex-wrap">
+                            {['CNG & Hybrids', 'Diesel', 'Electric', 'LPG', 'Petrol'].map((fuelType) => (
+                                <button
+                                    key={fuelType}
+                                    onClick={() => setFuel(fuelType)}
+                                    className={`border border-gray-300 rounded-lg py-2 px-4 text-[14px] text-gray-700 hover:bg-gray-100 transition-all ${
+                                        fuel === fuelType ? 'bg-blue-100 border-blue-500' : ''
+                                    }`}
+                                >
+                                    {fuelType}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-[14px] sm:text-[13px] font-medium text-gray-700 mb-1">Transmission *</label>
+                        <div className="flex gap-2 sm:gap-1">
+                            {['Automatic', 'Manual'].map((transType) => (
+                                <button
+                                    key={transType}
+                                    onClick={() => setTransmission(transType)}
+                                    className={`border rounded-lg py-1 px-3 text-[14px] sm:text-[13px] text-gray-700 hover:bg-blue-50 transition-all sm:flex-1 ${
+                                        transmission === transType ? 'bg-blue-100 border-blue-600' : 'border-gray-300'
+                                    } ${errors.transmission ? 'border-red-500' : ''}`}
+                                >
+                                    {transType}
+                                </button>
+                            ))}
+                        </div>
+                        {errors.transmission && <p className="text-[12px] text-red-500 mt-1">{errors.transmission}</p>}
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-[14px] sm:text-[13px] font-medium text-gray-700 mb-1">KM Driven *</label>
+                        <input
+                            type="number"
+                            value={kmDriven}
+                            onChange={(e) => setKmDriven(e.target.value)}
+                            className={`w-full border rounded-lg p-2 text-[16px] sm:text-[14px] text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                                errors.kmDriven ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                            placeholder="Enter KM driven (e.g., 45000)"
+                        />
+                        {errors.kmDriven && <p className="text-[12px] text-red-500 mt-1">{errors.kmDriven}</p>}
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-[14px] sm:text-[13px] font-medium text-gray-700 mb-2">No. of Owners *</label>
+                        <div className="flex flex-wrap gap-2 ">
+                            {['1st', '2nd', '3rd', '4th', '4+'].map((owner) => (
+                                <button
+                                    key={owner}
+                                    onClick={() => setOwners(owner)}
+                                    className={`border rounded-lg py-1 px-3 text-[14px] sm:text-[13px] text-gray-700 hover:bg-blue-50 transition-all sm:w-full ${
+                                        owners === owner ? 'bg-blue-100 border-blue-600' : 'border-gray-300'
+                                    } ${errors.owners ? 'border-red-500' : ''}`}
+                                >
+                                    {owner}
+                                </button>
+                            ))}
+                        </div>
+                        {errors.owners && <p className="text-[12px] text-red-500 mt-1">{errors.owners}</p>}
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-[14px] sm:text-[13px] font-medium text-gray-700 mb-1">Ad Title *</label>
+                        <input
+                            type="text"
+                            value={adTitle}
+                            onChange={(e) => setAdTitle(e.target.value)}
+                            className={`w-full border rounded-lg p-2 text-[16px] sm:text-[14px] text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                                errors.adTitle ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                            placeholder="Enter ad title (e.g., 'Toyota Camry 2022')"
+                        />
+                        <p className="text-[12px] sm:text-[11px] text-gray-500 mt-1">{adTitle.length} / 70</p>
+                        {errors.adTitle && <p className="text-[12px] text-red-500 mt-1">{errors.adTitle}</p>}
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-[14px] sm:text-[13px] font-medium text-gray-700 mb-1">Description *</label>
+                        <textarea
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            className={`w-full border rounded-lg p-2 text-[16px] sm:text-[14px] text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all h-32 resize-none ${
+                                errors.description ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                            placeholder="Describe your car (e.g., condition, features, reason for selling)"
+                        />
+                        <p className="text-[12px] sm:text-[11px] text-gray-500 mt-1">{description.length} / 4096</p>
+                        {errors.description && <p className="text-[12px] text-red-500 mt-1">{errors.description}</p>}
+                    </div>
+                </div>
+            </div>
+
+            {/* Set a Price */}
+            <div className="border-b border-gray-200 bg-white">
+                <div className="max-w-[851px] w-full mx-auto py-6 px-[20px] sm:px-[10px]">
+                    <h3 className="text-[20px] sm:text-[18px] font-semibold mb-4 text-gray-800">Set a Price</h3>
+                    <div className="mb-4">
+                        <label className="block text-[14px] sm:text-[13px] font-medium text-gray-700 mb-1">Price *</label>
+                        <input
+                            type="number"
+                            value={price}
+                            onChange={(e) => setPrice(e.target.value)}
+                            className={`w-full border rounded-lg p-2 text-[16px] sm:text-[14px] text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                                errors.price ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                            placeholder="Enter price (e.g., 850000)"
+                        />
+                        {errors.price && <p className="text-[12px] text-red-500 mt-1">{errors.price}</p>}
+                    </div>
+                </div>
+            </div>
+
+            {/* Upload Up to 20 Photos */}
+            <div className="border-b border-gray-200 bg-white">
+                <div className="max-w-[851px] w-full mx-auto py-6 px-[20px] sm:px-[10px]">
+                    <h3 className="text-[20px] sm:text-[18px] font-semibold mb-4 text-gray-800">Upload Up to 20 Photos</h3>
+                    <div className="grid grid-cols-5 md:grid-cols-4 sm:grid-cols-3 gap-3 mb-4">
+                        {[...Array(20)].map((_, index) => (
+                            <div
+                                key={index}
+                                className={`w-[100px] h-[100px] sm:w-[90px] sm:h-[90px] border-2 rounded-lg flex items-center justify-center relative ${
+                                    photos[index] ? 'border-gray-300' : 'border-dashed border-gray-400'
+                                }`}
+                            >
+                                {photos[index] ? (
+                                    <>
+                                        <img
+                                            src={URL.createObjectURL(photos[index])}
+                                            alt={`Uploaded ${index}`}
+                                            className="w-full h-full object-cover rounded-lg"
+                                        />
+                                        <button
+                                            onClick={() => removePhoto(index)}
+                                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] hover:bg-red-600 transition-all"
+                                        >
+                                            ✕
+                                        </button>
+                                    </>
+                                ) : (
+                                    <label className="cursor-pointer">
+                                        <svg
+                                            width="24px"
+                                            height="24px"
+                                            viewBox="0 0 1024 1024"
+                                            fillRule="evenodd"
+                                            className="text-gray-400 hover:text-gray-600 transition-all"
+                                        >
+                                            <path
+                                                className="rui-UJ1uk"
+                                                d="M512 85.333c235.648 0 426.667 191.019 426.667 426.667s-191.019 426.667-426.667 426.667c-235.648 0-426.667-191.019-426.667-426.667s191.019-426.667 426.667-426.667zM512 170.667c-188.629 0-341.333 152.704-341.333 341.333s152.704 341.333 341.333 341.333c188.629 0 341.333-152.704 341.333-341.333s-152.704-341.333-341.333-341.333zM682.667 512c0 23.552-19.115 42.667-42.667 42.667h-85.333v85.333c0 23.552-19.115 42.667-42.667 42.667s-42.667-19.115-42.667-42.667v-85.333h-85.333c-23.552 0-42.667-19.115-42.667-42.667s19.115-42.667 42.667-42.667h85.333v-85.333c0-23.552 19.115-42.667 42.667-42.667s42.667 19.115 42.667 42.667v85.333h85.333c23.552 0 42.667 19.115 42.667 42.667z"
+                                            />
+                                        </svg>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handlePhotoUpload}
+                                            className="hidden"
+                                        />
+                                    </label>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                    <p className="text-[12px] sm:text-[11px] text-gray-500">Only image files (max 5MB) are allowed.</p>
+                </div>
+            </div>
+
+            {/* Confirm Your Location */}
+            <div className="border-b border-gray-200 bg-white">
+                <div className="max-w-[851px] w-full mx-auto py-6 px-[20px] sm:px-[10px]">
+                    <h3 className="text-[20px] sm:text-[18px] font-semibold mb-4 text-gray-800">Confirm Your Location</h3>
+                    <div className="mb-4">
+                        <label className="block text-[14px] sm:text-[13px] font-medium text-gray-700 mb-1">State *</label>
+                        <div className="flex sm:flex-col sm:gap-2 items-center">
+                            <select
+                                value={location}
+                                onChange={(e) => setLocation(e.target.value)}
+                                className={`w-full border rounded-lg p-2 text-[16px] sm:text-[14px] text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all sm:mr-0 mr-2 ${
+                                    errors.location ? 'border-red-500' : 'border-gray-300'
+                                }`}
+                            >
+                                <option value="">Select State</option>
+                                <option value="Maharashtra">Maharashtra</option>
+                                <option value="Delhi">Delhi</option>
+                                <option value="Karnataka">Karnataka</option>
+                            </select>
+                            <a href="#" className="text-[14px] sm:text-[12px] text-blue-600 hover:underline">
+                                Current Location
+                            </a>
+                        </div>
+                        {errors.location && <p className="text-[12px] text-red-500 mt-1">{errors.location}</p>}
+                    </div>
+                </div>
+            </div>
+
+            {/* Review Your Details */}
+            <div className="border-b border-gray-200 bg-white">
+                <div className="max-w-[851px] w-full mx-auto py-6 px-[20px] sm:px-[10px]">
+                    <h3 className="text-[20px] sm:text-[18px] font-semibold mb-4 text-gray-800">Review Your Details</h3>
+                    <div className="flex items-center mb-4">
+                        <div className="w-10 h-10 sm:w-8 sm:h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-[20px] sm:text-[16px] shadow-sm">
+                            S
+                        </div>
+                        <div className="ml-3">
+                            <p className="text-[16px] sm:text-[14px] font-semibold text-gray-800">Name</p>
+                            <p className="text-[14px] sm:text-[12px] text-gray-600">synnefo intern</p>
+                        </div>
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-[14px] sm:text-[13px] font-medium text-gray-700 mb-1">Mobile Phone Number *</label>
+                        <div className="flex items-center">
+                            <span className="border border-gray-300 rounded-l-lg p-2 text-[16px] sm:text-[14px] text-gray-700 bg-gray-100">+91</span>
+                            <input
+                                type="text"
+                                className="w-full border border-gray-300 rounded-r-lg p-2 text-[16px] sm:text-[14px] text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                placeholder="Enter mobile number"
+                            />
+                        </div>
+                    </div>
+                    <button
+                        onClick={handleSubmit}
+                        disabled={!isFormValid}
+                        className={`w-full py-2 rounded-lg text-[16px] sm:text-[14px] font-semibold transition-all ${
+                            isFormValid
+                                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        }`}
+                    >
+                        Post Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default PostCarAdPage;

@@ -1,0 +1,35 @@
+import React from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
+
+const Signup = () => {
+  const { loginWithRedirect, logout, user, isAuthenticated } = useAuth0();
+
+  return (
+    <div className="h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded-lg shadow-md w-80">
+        <h2 className="text-2xl font-bold mb-4 text-center">Sign In / Sign Up</h2>
+
+        {!isAuthenticated ? (
+          <button
+            onClick={() => loginWithRedirect()}
+            className="bg-blue-600 text-white w-full py-2 rounded hover:bg-blue-700"
+          >
+            Continue with Auth0
+          </button>
+        ) : (
+          <>
+            <p className="text-center mb-4">Welcome, {user?.name}</p>
+            <button
+              onClick={() => logout({ returnTo: window.location.origin })}
+              className="bg-red-600 text-white w-full py-2 rounded hover:bg-red-700"
+            >
+              Log Out
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Signup;

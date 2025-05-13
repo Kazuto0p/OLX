@@ -1,0 +1,777 @@
+import React, { useState } from "react";
+import "./Navbar.css";
+import { useNavigate } from "react-router-dom";
+
+const Navbar = () => {
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  const toggleProfileDropdown = () => {
+    setIsProfileOpen(!isProfileOpen);
+  };
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+  const navigate = useNavigate()
+
+  const categories = [
+    {
+      title: "Cars",
+      items: [
+        "Cars",
+        "Bikes",
+        "Motorcycles",
+        "Scooters",
+        "Bicycle",
+        "Spare Parts",
+      ],
+    },
+    {
+      title: "Properties",
+      items: [
+        "For Sale: Houses & Apartments",
+        "For Rent: Houses & Apartments",
+        "Lands & Plots",
+        "For Sale: Shops & Offices",
+        "PG & Guest Houses",
+      ],
+    },
+    {
+      title: "Mobile Phones",
+      items: ["Mobile Phones", "Accessories", "Tablets"],
+    },
+    {
+      title: "Commercial Vehicles",
+      items: ["Commercial & Other Vehicles", "Spare Parts"],
+    },
+    {
+      title: "Jobs",
+      items: [
+        "Data entry & Back office",
+        "Sales & Marketing",
+        "BPO & Telecaller",
+        "Driver",
+        "Office Assistant",
+        "Delivery & Collection",
+        "Teacher",
+        "Cook",
+        "Receptionist & Front office",
+        "Operator & Technician",
+        "Other Jobs",
+      ],
+    },
+    {
+      title: "Furniture",
+      items: [
+        "Sofa & Dining",
+        "Beds & Wardrobes",
+        "Home Decor & Garden",
+        "Kids Furniture",
+        "Other Household Items",
+      ],
+    },
+    {
+      title: "Fashion",
+      items: ["Men", "Women", "Kids"],
+    },
+    {
+      title: "Books, Sports & Hobbies",
+      items: [
+        "Books",
+        "Gym & Fitness",
+        "Musical Instruments",
+        "Sports Equipment",
+        "Other Hobbies",
+      ],
+    },
+    {
+      title: "Pets",
+      items: [
+        "Fishes & Aquarium",
+        "Pet Food & Accessories",
+        "Dogs",
+        "Other Pets",
+      ],
+    },
+    {
+      title: "Services",
+      items: [
+        "Education & Classes",
+        "Tours & Travel",
+        "Electronics Repair & Services",
+        "Health & Beauty",
+        "Home Renovation & Repair",
+        "Cleaning & Pest Control",
+        "Legal Documentation Services",
+        "Packers & Movers",
+        "Other Services",
+      ],
+    },
+    {
+      title: "Electronics & Appliances",
+      items: [
+        "TVs, Video - Audio",
+        "Kitchen & Other Appliances",
+        "Computers & Laptops",
+        "Cameras & Lenses",
+        "Games & Entertainment",
+        "Fridges",
+        "Computer Accessories",
+        "Hard Disks, Printers & Monitors",
+        "ACs",
+        "Washing Machines",
+      ],
+    },
+    {
+      title: "IT Engineer & Developer",
+      items: ["Hotel & Travel Executive", "Accountant", "Designer", "Other"],
+    },
+  ];
+
+  return (
+    <nav>
+      <div className="nav-top">
+        {/* Left Section: Logo and Location Dropdown */}
+        <div className="nav-left">
+          <img src="src/assets/images/olx_logo_2025.svg" alt="OLX Logo" />
+          <div className="relative">
+            <select>
+              <option>India</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="nav-search">
+          <div className="search-container">
+            <input type="text" placeholder='Search "Cars"' />
+            <button>
+              <svg
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                ></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div className="nav-right">
+          <select>
+            <option>ENGLISH</option>
+          </select>
+          <button>
+            <svg
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+              ></path>
+            </svg>
+          </button>
+          <button>
+            <svg
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+              ></path>
+            </svg>
+          </button>
+
+          <div className="profile-section" onClick={toggleProfileDropdown}>
+            <img
+              src={`src/assets/react.svg`}
+              alt="Profile"
+              className="profile-pic"
+            />
+
+            {isProfileOpen && (
+              <div className="profile-dropdown">
+                <div id="BORD">
+                  <div className="sidebar-content">
+                    <div className="profile-section">
+                      <img
+                        src={`src/assets/react.svg`}
+                        alt="Profile"
+                        className="profile-pic"
+                      />
+                      <span className="username">Synnefo</span>
+                    </div>
+                    <button id="vep">View and edit profile</button>
+                  </div>
+                </div>
+                {/* <div id='BORD'>
+                  <div className="sidebar-content">
+                    <div className="profile-section1">
+                      <img
+                        src={`src/assets/react.svg`}
+                        alt="Profile"
+                        className="profile-pic"
+                      />
+                      <span className="username">Synnefo</span>
+
+                    </div>
+                    <button id='vep'>View and edit profile</button>
+                  </div>
+                </div> */}
+
+                <div className="profile-section1">
+                  <div className="BORD">
+                    <div style={{ display: "flex", gap: "14%", width: "100%" }}>
+                      <img
+                        src={`src/assets/icons/icon_1.svg`}
+                        alt="Profile"
+                        className="profile-pic1"
+                      />
+                      <span className="username">My ADS</span>
+                    </div>{" "}
+                    <br />
+                    <div style={{ display: "flex", gap: "14%", width: "100%" }}>
+                      <img
+                        src={`src/assets/icons/icon_5.svg`}
+                        alt="Profile"
+                        className="profile-pic1"
+                      />
+                      <span className="username">Buy Business Packages</span>
+                    </div>{" "}
+                    <br />
+                    <div style={{ display: "flex", gap: "14%", width: "100%" }}>
+                      <img
+                        src={`src/assets/icons/card.png`}
+                        alt="Profile"
+                        className="profile-pic1"
+                      />
+                      <span className="username">
+                        Bought Packages & Billing
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="profile-section1">
+                  <div className="BORD">
+                    <div style={{ display: "flex", gap: "14%", width: "100%" }}>
+                      <img
+                        src={`src/assets/icons/question.png`}
+                        alt="Profile"
+                        className="profile-pic1"
+                      />
+                      <span className="username">Help</span>
+                    </div>{" "}
+                    <br />
+                    <div style={{ display: "flex", gap: "14%", width: "100%" }}>
+                      <img
+                        src={`src/assets/icons/gear.png`}
+                        alt="Profile"
+                        className="profile-pic1"
+                      />
+                      <span className="username">Settings</span>
+                    </div>{" "}
+                    <br />
+                    <div style={{ display: "flex", gap: "14%", width: "100%" }}>
+                      <img
+                        src={`src/assets/icons/left-arrow.png`}
+                        alt="Profile"
+                        className="profile-pic1"
+                      />
+                      <span className="username">Logout</span>
+                    </div>
+                  </div>
+                  <div></div>
+                </div>
+                
+              </div>
+            )}
+          </div>
+
+          <button className="sell-button " onClick={()=>navigate("/sell")}>
+            <svg
+              width="100"
+              height="40"
+              viewBox="0 0 100 40"
+              preserveAspectRatio="none"
+            >
+              <defs>
+                <linearGradient
+                  id="splitBorder"
+                  x1="0%"
+                  y1="0%"
+                  x2="100%"
+                  y2="0%"
+                >
+                  <stop offset="50%" stopColor="#facc15" />
+                  <stop offset="50%" stopColor="#1e40af" />
+                </linearGradient>
+              </defs>
+              <rect
+                x="2"
+                y="2"
+                width="96"
+                height="36"
+                rx="18"
+                ry="18"
+                fill="#ffffff"
+                stroke="url(#splitBorder)"
+                strokeWidth="4"
+              />
+            </svg>
+            <span className="sell-button-text">+ SELL</span>
+          </button>
+        </div>
+      </div>
+
+      <div className="nav-bottom">
+        <div className="category-dropdown">
+          <button onClick={toggleDropdown} className="category-button">
+            ALL CATEGORIES
+            <svg
+              className="dropdown-arrow"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M19 9l-7 7-7-7"
+              ></path>
+            </svg>
+          </button>
+
+          {isDropdownOpen && (
+            <div className="dropdown-menu">
+              <div className="dropdown-content">
+                {categories.map((category, index) => (
+                  <div key={index} className="category-section">
+                    <h3>{category.title}</h3>
+                    <ul>
+                      {category.items.map((item, idx) => (
+                        <li key={idx}>
+                          <button>{item}</button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <button>Cars</button>
+        <button>Motorcycles</button>
+        <button>Mobile Phones</button>
+        <button>For Sale: Houses & Apartments</button>
+        <button>Scooters</button>
+        <button>Commercial & Other Vehicles</button>
+        <button>For Rent: Houses & Apartments</button>
+      </div>
+    </nav>
+  );
+};
+
+export default Navbar;
+
+
+
+
+
+css
+
+/* Navbar container */
+nav {
+  background-color: #ffffff;
+  border-bottom: 1px solid #d1d5db;
+}
+
+/* Top section: Logo, search, and buttons */
+.nav-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+}
+
+/* Left Section: Logo and Location Dropdown */
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.nav-left img {
+  height: 32px;
+}
+
+.nav-left select {
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  width: 120%;
+  padding: 8px;
+  color: #374151;
+  background-color: #ffffff;
+  font-size: 14px;
+}
+
+/* Search bar section */
+.nav-search {
+  display: flex;
+  align-items: center;
+  width: 50%;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.search-container input {
+  width: 100%;
+  padding: 6px;
+  border: 4px solid #000000;
+  border-right: none;
+  border-radius: 4px 0 0 4px;
+  font-size: 14px;
+  outline: none;
+}
+
+.search-container button {
+  background-color: #1f2937;
+  padding: 8.5px;
+  border-radius: 0 4px 4px 0;
+}
+
+.search-container button svg {
+  width: 24px;
+  height: 24px;
+  color: #ffffff;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.nav-right select {
+  color: #374151;
+  background-color: transparent;
+  border: none;
+  font-size: 14px;
+}
+
+.nav-right button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.nav-right button svg {
+  width: 24px;
+  height: 24px;
+  color: #374151;
+}
+
+.profile-container {
+  position: relative;
+}
+
+.profile-badge {
+  position: absolute;
+  top: -10px;
+  right: -4px;
+  background-color: #8b5cf6;
+  color: #ffffff;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+button.sell-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 100px;
+  height: 40px;
+}
+
+button.sell-button svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.sell-button-text {
+  color: #000000;
+  font-weight: bold;
+  font-size: 14px;
+  text-transform: uppercase;
+  z-index: 1;
+}
+
+button.sell-button:hover svg rect {
+  fill: #f5f5f5;
+}
+
+.nav-bottom {
+  display: flex;
+  gap: 16px;
+  padding: 8px 16px;
+  color: #374151;
+  border-top: 1px solid #d1d5db;
+}
+
+.nav-bottom select {
+  font-weight: 600;
+  background-color: transparent;
+  border: none;
+  font-size: 14px;
+}
+
+.nav-bottom button {
+  background: none;
+  border: none;
+  color: #374151;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+
+.category-dropdown {
+  position: relative;
+}
+
+.category-button {
+  font-weight: 600;
+  background-color: transparent;
+  border: none;
+  font-size: 14px;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.dropdown-arrow {
+  width: 16px;
+  height: 16px;
+  margin-left: 4px;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  width: 1300px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.dropdown-content {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding: 16px;
+}
+
+.category-section h3 {
+  font-weight: 600;
+  font-size: 14px;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+.category-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.category-section li {
+  margin-bottom: 4px;
+}
+
+.category-section li button {
+  background: none;
+  border: none;
+  color: #374151;
+  font-size: 14px;
+  text-align: left;
+  width: 100%;
+  padding: 4px 0;
+  cursor: pointer;
+}
+
+.category-section li button:hover {
+  color: #1e40af;
+  font-weight: 500;
+}
+
+.nav-bottom {
+  display: flex;
+  gap: 16px;
+  padding: 8px 16px;
+  color: #374151;
+  border-top: 1px solid #d1d5db;
+  position: relative;
+}
+
+
+/* .profile-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-pic {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-right: 10px;
+} */
+
+
+.profile-section {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  gap: 20%;
+}
+
+.profile-pic {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.profile-section1 {
+  position: relative;
+  cursor: pointer;
+  gap: 20%;
+}
+
+.profile-pic1 {
+  width: 28px;
+  height: 32px;
+  
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: 40px;
+  right: -72%;
+  background-color: rgb(170, 170, 170);
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  /* padding: 0.5rem 20px; */
+  /* width: 960%; */
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.profile-dropdown ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.profile-dropdown li button {
+  background: none;
+  border: none;
+  padding: 10px 15px;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+}
+
+.profile-dropdown li button:hover {
+  background-color: #f5f5f5;
+}
+
+
+
+#vep {
+  border: solid #004896 5.5px;
+  background-color: #004896;
+  color: white;
+  font-weight: bolder;
+  padding: 10px;
+  width: 256px;
+  border-radius: 5px;
+  margin-top: 4%;
+}
+
+#vep:hover {
+  color: #004896;
+  background-color: white;
+}
+
+.hr {
+  border-top-width: 1px;
+  width: 116%;
+  position: relative;
+  left: -21px;
+}
+
+/* #BORD {
+  border-bottom:solid #374151 1px;
+} */
+
+#BORD {
+  padding: 15px;
+  background-color: white;
+  /* display: flex; */
+  /* gap: 30%; */
+  width: 100%;
+}
+
+
+.BORD {
+  padding: 15px;
+  background-color: white;
+  /* display: flex; */
+  /* gap: 30%; */
+  width: 100%;
+}

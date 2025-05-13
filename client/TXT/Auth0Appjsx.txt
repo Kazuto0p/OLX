@@ -1,0 +1,64 @@
+import React from 'react';
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
+import { useAuth0 } from '@auth0/auth0-react';
+
+import Navbar from './Components/Nav/Navbar';
+import Footer from './Components/Footer/Footer';
+import Nav2 from './Components/Nav2/Nav2';
+
+import Post from './Pages/Sell_Post/Post';
+import PostAdPage from './Pages/Sell_Post/subpages/PostAdPage';
+import PostCarAdPage from './Pages/Sell_Post/subpages/PostCarAdPage';
+import Bike from './Pages/Sell_Post/subpages/Bike';
+import Cards from './Components/Card/Card';
+import Signup from './Pages/Signup/Signup';
+
+
+const HomeLayout = ({ children }) => (
+  <>
+    <Navbar />
+    {children}
+    <Footer />
+  </>
+);
+
+const SellLayout = ({ children }) => (
+  <>
+    <Nav2 />
+    {children}
+  </>
+);
+
+
+const PrivateRoute = ({ children }) => {
+  const { isAuthenticated, isLoading } = useAuth0();
+
+  if (isLoading) return <div className="text-center mt-10">Loading...</div>;
+  return isAuthenticated ? children : <Navigate to="/sign" replace />;
+};
+
+
+const App = () => {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Navigate to="/home" />} />
+        <Route path="/sign" element={<Signup />} />
+
+       
+        <Route path="/home" element={<HomeLayout><Cards /></HomeLayout>} />
+
+        
+        <Route path="/sell" element={ <PrivateRoute><SellLayout><Post /></SellLayout></PrivateRoute> } />
+        <Route path="/add" element={<PrivateRoute><SellLayout><PostAdPage /></SellLayout></PrivateRoute> } />
+        <Route path="/addcar" element={<PrivateRoute> <SellLayout><PostCarAdPage /></SellLayout> </PrivateRoute>} />
+        <Route path="/bike" element={<PrivateRoute> <SellLayout><Bike /></SellLayout> </PrivateRoute>} />
+
+
+        <Route path="*" element={<h1 className="text-center mt-10">404 - Page Not Found</h1>} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
+export default App;

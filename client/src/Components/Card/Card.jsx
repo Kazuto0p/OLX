@@ -27,7 +27,7 @@ const Card = () => {
         {posts.map((post, index) => (
           <div key={index} className="bg-white shadow-md rounded-xl p-4">
             <img
-              src={`http://localhost:8080/${post.image}`} 
+              src={`http://localhost:8080/${post.photos}`} 
               alt="Post Image"
               className="w-full h-48  rounded-md mb-3 object-contain"
               onError={(e) => {
@@ -35,9 +35,9 @@ const Card = () => {
               }}
             />
             <h3 className="text-lg font-semibold mb-1">₹{post.price}</h3>
-            <p className="text-sm text-gray-600 mb-1">{post.subd}</p>
-            <p className="text-sm">{post.details}</p>
-            <p className="text-xs text-gray-400 mt-2">{post.place}</p>
+            <p className="text-sm ">{post.adTitle}</p>
+            <p className="text-sm text-gray-600 mb-1">{post.description}</p>
+            <p className="text-xs text-gray-400 mt-2">{post.location}</p>
           </div>
         ))}
       </div>

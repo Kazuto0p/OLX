@@ -8,7 +8,7 @@ const Nav2 = ({ backTo = -1 }) => {
         if (typeof backTo === 'string') {
             navigate(backTo);
         } else {
-            navigate(-1); // Go back in history
+            navigate(-1);
         }
     };
 

@@ -1,54 +1,97 @@
-import Posts from '../models/post.model.js'
-export  async function addPost(req,res) {
-    console.log(req.body);
-    
-    try {
+import Post from '../models/post.model.js';
 
-        console.log("Inside addpost trycatch");
-       
-        const file = req.file;
-
-        if (!file) {
-            return res.status(400).json({ message: "Blog image is required" });
-        }
-        
-        const {price , subd , details , place } = req.body;
-        console.log(req.body);
-        
-        if (!price || !details || !place){
-            return res.status(400).json({message:" Something is missing "})
-        }
-            
-        const data = await Posts.create ({
-            price,
-            image:file.path,
-            subd,
-            details,
-            place,
-        });
-
-        res.status(201).json({ message : "Post Upload Sussfully ",data });
-        
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ message : "Internal Server Error ", error:error})
-        
+// Controller for adding a new post
+export async function addPost(req, res) {
+  try {
+    const files = req.files || [];
+    if (files.length === 0) {
+      return res.status(400).json({ message: 'At least one photo is required.' });
     }
-};
 
+    const {
+      brand = '',
+      year = '',
+      fuel = '',
+      transmission = '',
+      kmDriven = '',
+      owners = '',
+      adTitle = '',
+      description = '',
+      price = '',
+      location = '',
+      phone = ''
+    } = req.body;
 
-export async function loadpost(req,res) {
-    try {
-        const data = await Posts.find()
-        if (data) {
-            console.log("Loading posts.........");
-            console.log(data);
-            
-            
-            return res.status(200).json({message:"Success",data})
-        }
-    } catch (error) {
-        return res.status(500).json({message:"Server side error"})
-        
+    // Basic validation
+    if (
+      !brand || !year || !fuel || !transmission || !kmDriven || !owners ||
+      !adTitle || !description || !price || !location || !phone
+    ) {
+      return res.status(400).json({ message: 'One or more required fields are missing.' });
     }
+
+    const photos = files.map(file => file.path);
+
+    const newPost = await Post.create({
+      brand: brand.trim(),
+      year: Number(year),
+      fuel,
+      transmission,
+      kmDriven: Number(kmDriven),
+      owners,
+      adTitle: adTitle.trim(),
+      description: description.trim(),
+      price: Number(price),
+      location: location.trim(),
+      phone: phone.trim(),
+      photos
+    });
+
+    return res.status(201).json({ message: 'Post created successfully', data: newPost });
+  } catch (error) {
+    console.error('addPost error:', error.stack || error);
+    return res.status(500).json({ message: 'Internal Server Error', error: error.message });
+  }
+}
+
+
+export async function addPost1(req, res) {
+    try {
+      const files = req.files || [];
+      if (files.length === 0) {
+        return res.status(400).json({ message: 'At least one photo is required.' });
+      }
+  
+      const { title = '', description = '', price = '', location = '' } = req.body;
+      if (!title || !description || !price || !location) {
+        return res.status(400).json({ message: 'Missing title, description, price or location.' });
+      }
+  
+      const photos = files.map(f => f.path);
+      const newPost = await Post.create({
+        title: title.trim(),
+        description: description.trim(),
+        price: Number(price),
+        location: location.trim(),
+        photos
+      });
+  
+      return res.status(201).json({ message: 'Post created successfully', data: newPost });
+    } catch (err) {
+      console.error('addPost error:', err);
+      return res.status(500).json({ message: 'Internal Server Error', error: err.message });
+    }
+  }
+  
+
+// Controller for loading posts
+export async function loadpost(req, res) {
+  try {
+    const posts = await Post.find().sort({ createdAt: -1 });
+    console.log('Loading posts:', posts);
+    return res.status(200).json({ message: 'Success', data: posts });
+  } catch (error) {
+    console.error('loadpost error:', error.stack || error);
+    return res.status(500).json({ message: 'Server side error', error: error.message });
+  }
 }

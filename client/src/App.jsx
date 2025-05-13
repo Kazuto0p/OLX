@@ -10,12 +10,17 @@ import PostCarAdPage from './Pages/Sell_Post/subpages/PostCarAdPage'
 import Bike from './Pages/Sell_Post/subpages/Bike'
 import Cards from './Components/Card/Card'
 import Carr from './Pages/TEST/Carr'
+// import Signup from './Pages/Signup/Signup'
+import Footer2 from './Components/Footer2/Footer2'
+import AuthRestore from './Pages/Home/AuthRestore'
 
 const App = () => {
   return (
     <div>
+  
      
       <BrowserRouter>
+      <AuthRestore />
       {/* <Navbar /> */}
       
       {/* <Nav2 /> */}
@@ -25,7 +30,9 @@ const App = () => {
       
       
         <Routes>
-          <Route path='/home' element={<><Navbar /> <Cards/><Footer /></> } />
+
+          {/* <Route path='/sign' element={<><Signup /></>} /> */}
+          <Route path='/' element={<><Navbar /> <Cards/><Footer2 /><Footer /></> } />
           {/* <Route path='/footer' element={<Nav2 />} /> */}
           <Route path='/sell' element={<><Nav2 /><Post /></>} />
           <Route path='/add' element={<><Nav2/><PostAdPage /></>} />
@@ -34,8 +41,6 @@ const App = () => {
           {/* <Route path='/cars' element={<><Nav2 /><Carr /></>} /> */}
         </Routes>
       </BrowserRouter>
-      
-      
     </div>
   )
 }

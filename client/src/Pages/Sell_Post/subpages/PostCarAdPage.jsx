@@ -1,60 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 
-const PostCarAdPage = () => {
-  const [formData, setFormData] = useState({
-    brand: '',
-    year: '',
-    fuel: '',
-    transmission: '',
-    kmDriven: '',
-    owners: '',
-    adTitle: '',
-    description: '',
-    price: '',
-    location: '',
-    phone: '',
-  });
-  const [photos, setPhotos] = useState([]);
-
-  const updateField = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handlePhotoUpload = (e) => {
-    const files = Array.from(e.target.files);
-    setPhotos(prev => [...prev, ...files].slice(0, 20));
-  };
-
-  const removePhoto = (index) => {
-    setPhotos(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const InputField = ({ label, type = 'text', field, placeholder }) => (
-    <div className="mb-5">
-      <label className="block text-sm font-medium text-gray-600 mb-1">{label}</label>
+const InputField = ({ label, value, onChange, type = 'text', placeholder, maxLength, showCount }) => (
+  <div className="mb-5">
+    <label className="block text-sm font-medium text-gray-600 mb-1">{label}</label>
+    {type === 'textarea' ? (
+      <>
+        <textarea
+          value={value}
+          onChange={onChange}
+          maxLength={maxLength}
+          placeholder={placeholder}
+          className="w-full border rounded-lg p-3 text-gray-700 h-32 resize-none focus:ring-2 focus:ring-blue-500"
+        />
+        {showCount && <p className="text-xs text-gray-500 mt-1">{value.length} / {maxLength}</p>}
+      </>
+    ) : (
       <input
         type={type}
-        value={formData[field]}
-        onChange={(e) => updateField(field, e.target.value)}
+        value={value}
+        onChange={onChange}
         placeholder={placeholder}
+        maxLength={maxLength}
         className="w-full border rounded-lg p-3 text-gray-700 focus:ring-2 focus:ring-blue-500"
       />
-    </div>
-  );
+    )}
+  </div>
+);
 
-  const SectionTitle = ({ title }) => (
-    <h3 className="text-lg font-semibold mb-4 text-gray-800">{title}</h3>
-  );
-
-  const OptionButtons = ({ field, options }) => (
+const OptionButtons = ({ label, field, value, options, onSelect }) => (
+  <div className="mb-5">
+    <label className="block text-sm font-medium text-gray-600 mb-1">{label}</label>
     <div className="flex gap-2 flex-wrap">
-      {options.map((opt) => (
+      {options.map(opt => (
         <button
           key={opt}
           type="button"
-          onClick={() => updateField(field, opt)}
+          onClick={() => onSelect(field, opt)}
           className={`border rounded-lg py-2 px-4 text-sm ${
-            formData[field] === opt
+            value === opt
               ? 'bg-blue-100 border-blue-500 text-blue-700'
               : 'border-gray-300 text-gray-700 hover:bg-gray-100'
           }`}
@@ -63,139 +46,169 @@ const PostCarAdPage = () => {
         </button>
       ))}
     </div>
-  );
+  </div>
+);
+
+const PhotoGrid = ({ photos, onUpload, onRemove, max = 20 }) => (
+  <div className="grid grid-cols-5 gap-3 mb-4">
+    {Array.from({ length: max }).map((_, idx) => (
+      <div
+        key={idx}
+        className={`w-[100px] h-[100px] border-2 rounded-lg flex items-center justify-center relative ${
+          photos[idx] ? 'border-gray-300' : 'border-dashed border-gray-400'
+        }`}
+      >
+        {photos[idx] ? (
+          <>
+            <img
+              src={URL.createObjectURL(photos[idx])}
+              alt={`Upload ${idx}`}
+              className="w-full h-full object-cover rounded-lg"
+            />
+            <button
+              type="button"
+              onClick={() => onRemove(idx)}
+              className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+            >
+              ✕
+            </button>
+          </>
+        ) : (
+          <label className="cursor-pointer">
+            <input type="file" accept="image/*" onChange={onUpload} className="hidden" />
+            <span className="text-gray-400 text-xl">＋</span>
+          </label>
+        )}
+      </div>
+    ))}
+  </div>
+);
+
+const SelectField = ({ label, value, onChange, options, link }) => (
+  <div className="mb-4 flex gap-3 items-center">
+    <select
+      value={value}
+      onChange={onChange}
+      className="w-full border rounded-lg p-3 text-gray-700 focus:ring-2 focus:ring-blue-500"
+    >
+      <option value="">Select {label}</option>
+      {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+    </select>
+    {link && <a href="#" className="text-sm text-blue-600 hover:underline">{link}</a>}
+  </div>
+);
+
+const PostCarAdPage = () => {
+  const initial = {
+    brand: '', year: '', fuel: '', transmission: '', kmDriven: '', owners: '',
+    adTitle: '', description: '', price: '', location: '', phone: ''
+  };
+  const [formData, setFormData] = useState(initial);
+  const [photos, setPhotos] = useState([]);
+  const [submitting, setSubmitting] = useState(false);
+
+  const updateField = useCallback((field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  }, []);
+
+  const handlePhotoUpload = useCallback(e => {
+    const files = Array.from(e.target.files);
+    setPhotos(prev => [...prev, ...files].slice(0, 20));
+  }, []);
+
+  const removePhoto = useCallback(idx => {
+    setPhotos(prev => prev.filter((_, i) => i !== idx));
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      const data = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        data.append(key, value);
+      });
+      photos.forEach((file) => {
+        data.append('photos', file);
+      });
+      const res = await fetch('http://localhost:8080/api/posts', {
+        method: 'POST',
+        body: data
+      });
+      if (!res.ok) throw new Error('Network response was not ok');
+      const result = await res.json();
+      console.log('Success:', result);
+      setFormData(initial);
+      setPhotos([]);
+    } catch (err) {
+      console.error('Error submitting form:', err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
+    <form onSubmit={handleSubmit} className="p-6 bg-gray-100 min-h-screen">
       <div className="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow-lg">
         <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Post Your Car Ad</h2>
 
-        <SectionTitle title="Details" />
-
-        <div className="grid grid-cols-1 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">Brand *</label>
-            <select
-              value={formData.brand}
-              onChange={(e) => updateField('brand', e.target.value)}
-              className="w-full border rounded-lg p-3 text-gray-700 focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Select Brand</option>
-              <option value="Toyota">Toyota</option>
-              <option value="Honda">Honda</option>
-              <option value="Ford">Ford</option>
-            </select>
-          </div>
-
-          <InputField label="Year *" field="year" placeholder="e.g. 2022" type="number" />
-
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">Fuel *</label>
-            <OptionButtons
-              field="fuel"
-              options={['CNG & Hybrids', 'Diesel', 'Electric', 'LPG', 'Petrol']}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">Transmission *</label>
-            <OptionButtons field="transmission" options={['Automatic', 'Manual']} />
-          </div>
-
-          <InputField label="KM Driven *" field="kmDriven" type="number" placeholder="e.g. 45000" />
-
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">No. of Owners *</label>
-            <OptionButtons field="owners" options={['1st', '2nd', '3rd', '4th', '4+']} />
-          </div>
-
-          <InputField
-            label="Ad Title *"
-            field="adTitle"
-            placeholder="e.g. Toyota Camry 2022"
+        <section>
+          <h3 className="text-lg font-semibold mb-4 text-gray-800">Details</h3>
+          <SelectField
+            label="Brand"
+            value={formData.brand}
+            onChange={e => updateField('brand', e.target.value)}
+            options={['Toyota','Honda','Ford']}
           />
-          <p className="text-xs text-gray-500 mb-3">{formData.adTitle.length} / 70</p>
+          <InputField label="Year *" type="number" value={formData.year} onChange={e => updateField('year', e.target.value)} placeholder="e.g. 2022" />
+          <OptionButtons label="Fuel *" field="fuel" value={formData.fuel} options={['CNG & Hybrids','Diesel','Electric','LPG','Petrol']} onSelect={updateField} />
+          <OptionButtons label="Transmission *" field="transmission" value={formData.transmission} options={['Automatic','Manual']} onSelect={updateField} />
+          <InputField label="KM Driven *" type="number" value={formData.kmDriven} onChange={e => updateField('kmDriven', e.target.value)} placeholder="e.g. 45000" />
+          <OptionButtons label="No. of Owners *" field="owners" value={formData.owners} options={['1st','2nd','3rd','4th','4+']} onSelect={updateField} />
+          <InputField label="Ad Title *" value={formData.adTitle} onChange={e => updateField('adTitle', e.target.value)} placeholder="e.g. Toyota Camry 2022" maxLength={70} showCount />
+          <InputField label="Description *" type="textarea" value={formData.description} onChange={e => updateField('description', e.target.value)} placeholder="Describe your car (condition, features, etc.)" maxLength={4096} showCount />
+        </section>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">Description *</label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => updateField('description', e.target.value)}
-              className="w-full border rounded-lg p-3 text-gray-700 h-32 resize-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Describe your car (condition, features, etc.)"
-            />
-            <p className="text-xs text-gray-500 mt-1">{formData.description.length} / 4096</p>
-          </div>
-        </div>
+        <section>
+          <h3 className="text-lg font-semibold mb-4 text-gray-800">Price</h3>
+          <InputField label="Price *" type="number" value={formData.price} onChange={e => updateField('price', e.target.value)} placeholder="e.g. 850000" />
+        </section>
 
-        <SectionTitle title="Price" />
-        <InputField field="price" type="number" placeholder="e.g. 850000" label="Price *" />
+        <section>
+          <h3 className="text-lg font-semibold mb-4 text-gray-800">Upload Photos (Max 20)</h3>
+          <PhotoGrid photos={photos} onUpload={handlePhotoUpload} onRemove={removePhoto} />
+        </section>
 
-        <SectionTitle title="Upload Photos (Max 20)" />
-        <div className="grid grid-cols-5 gap-3 mb-4">
-          {[...Array(20)].map((_, index) => (
-            <div
-              key={index}
-              className={`w-[100px] h-[100px] border-2 rounded-lg flex items-center justify-center relative ${
-                photos[index] ? 'border-gray-300' : 'border-dashed border-gray-400'
-              }`}
-            >
-              {photos[index] ? (
-                <>
-                  <img
-                    src={URL.createObjectURL(photos[index])}
-                    alt={`Upload ${index}`}
-                    className="w-full h-full object-cover rounded-lg"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removePhoto(index)}
-                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
-                  >
-                    ✕
-                  </button>
-                </>
-              ) : (
-                <label className="cursor-pointer">
-                  <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
-                  <span className="text-gray-400 text-xl">＋</span>
-                </label>
-              )}
-            </div>
-          ))}
-        </div>
-
-        <SectionTitle title="Location" />
-        <div className="flex gap-3 items-center mb-4">
-          <select
+        <section>
+          <h3 className="text-lg font-semibold mb-4 text-gray-800">Location</h3>
+          <SelectField
+            label="State"
             value={formData.location}
-            onChange={(e) => updateField('location', e.target.value)}
-            className="w-full border rounded-lg p-3 text-gray-700 focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Select State</option>
-            <option value="Maharashtra">Maharashtra</option>
-            <option value="Delhi">Delhi</option>
-            <option value="Karnataka">Karnataka</option>
-          </select>
-          <a href="#" className="text-sm text-blue-600 hover:underline">Current Location</a>
-        </div>
+            onChange={e => updateField('location', e.target.value)}
+            options={['Maharashtra','Delhi','Karnataka']}
+            link="Current Location"
+          />
+        </section>
 
-        <SectionTitle title="Verify Identity" />
-        <InputField
-          field="phone"
-          type="text"
-          label="Mobile Phone Number *"
-          placeholder="Enter mobile number"
-        />
+ 
+        <section>
+          <h3 className="text-lg font-semibold mb-4 text-gray-800">Verify Identity</h3>
+        </section>
+        <InputField label="Mobile Phone Number *" type="text" value={formData.phone} onChange={e => updateField('phone', e.target.value)} placeholder="Enter mobile number" />
 
         <button
-          disabled
-          className="w-full mt-4 bg-gray-300 text-white py-3 rounded-lg font-semibold shadow-md cursor-not-allowed"
+          type="submit"
+          disabled={submitting}
+          className={`w-full mt-4 py-3 rounded-lg font-semibold shadow-md ${
+            submitting
+              ? 'bg-gray-300 text-white cursor-not-allowed'
+              : 'bg-blue-600 text-white hover:bg-blue-700'
+          }`}
         >
-          Post Now
+          {submitting ? 'Posting...' : 'Post Now'}
         </button>
       </div>
-    </div>
+    </form>
   );
 };
 

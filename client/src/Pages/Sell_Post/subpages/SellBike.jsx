@@ -44,7 +44,7 @@ const SellBike = () => {
     },
   ];
 
-  const bikeBrands = ['BMW', 'Ducati', 'Bentley'];
+  const bikeBrands = ['BMW', 'Ducati', 'Bentley','Yamaha','Extra','Honda','Kawasaki','Hero','KTM'];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -119,7 +119,7 @@ const SellBike = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:8080/posts', formDataToSend, {
+      const response = await axios.post('http://localhost:8080/api/posts', formDataToSend, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setSuccess(response.data.message);

@@ -1,25 +1,31 @@
-// import React, { useState } from "react";
+// import React, { useState, useEffect } from "react";
 // import "./Navbar.css";
 // import { useNavigate } from "react-router-dom";
+// import { useAuth0 } from "@auth0/auth0-react";
 // import LoginButton from "../auth/login/Login";
 // import LogoutButton from "../auth/logout/Logout";
 // import Profile from "../auth/profile/Profile";
 
-
-
 // const Navbar = () => {
+//   const { user, isAuthenticated, isLoading } = useAuth0();
 //   const [isProfileOpen, setIsProfileOpen] = useState(false);
+//   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+//   const navigate = useNavigate();
+
+//   // Store user email in localStorage when authenticated
+//   useEffect(() => {
+//     if (isAuthenticated && user?.email) {
+//       localStorage.setItem("email", user.email);
+//     }
+//   }, [isAuthenticated, user]);
 
 //   const toggleProfileDropdown = () => {
 //     setIsProfileOpen(!isProfileOpen);
 //   };
 
-//   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
 //   const toggleDropdown = () => {
 //     setIsDropdownOpen(!isDropdownOpen);
 //   };
-//   const navigate = useNavigate()
 
 //   const categories = [
 //     {
@@ -135,6 +141,10 @@
 //     },
 //   ];
 
+//   if (isLoading) {
+//     return <div>Loading...</div>;
+//   }
+
 //   return (
 //     <nav>
 //       <div className="nav-top">
@@ -205,45 +215,39 @@
 //           </button>
 
 //           <div className="profile-section" onClick={toggleProfileDropdown}>
-//             <img
-//               src={`src/assets/react.svg`}
-//               alt="Profile"
-//               className="profile-pic"
-//             />
-
-//             <LoginButton/>
-//             <Profile/>
-//             <LogoutButton/>
+//             {isAuthenticated ? (
+//               <img
+//                 src={user?.picture || "src/assets/react.svg"}
+//                 alt="Profile"
+//                 className="profile-pic"
+//               />
+//             ) : (
+//               <LoginButton />
+//             )}
 
 //             {isProfileOpen && (
 //               <div className="profile-dropdown">
 //                 <div id="BORD">
 //                   <div className="sidebar-content">
 //                     <div className="profile-section">
-//                       <img
-//                         src={`src/assets/react.svg`}
-//                         alt="Profile"
-//                         className="profile-pic"
-//                       />
-//                       <span className="username">Synnefo</span>
+//                       {isAuthenticated ? (
+//                         <>
+//                           <img
+//                             src={user?.picture || "src/assets/react.svg"}
+//                             alt="Profile"
+//                             className="profile-pic"
+//                           />
+//                           <span className="username truncate">
+//                             {user.name}
+//                           </span>
+//                         </>
+//                       ) : (
+//                         <span className="username">Guest</span>
+//                       )}
 //                     </div>
 //                     <button id="vep">View and edit profile</button>
 //                   </div>
 //                 </div>
-//                 {/* <div id='BORD'>
-//                   <div className="sidebar-content">
-//                     <div className="profile-section1">
-//                       <img
-//                         src={`src/assets/react.svg`}
-//                         alt="Profile"
-//                         className="profile-pic"
-//                       />
-//                       <span className="username">Synnefo</span>
-
-//                     </div>
-//                     <button id='vep'>View and edit profile</button>
-//                   </div>
-//                 </div> */}
 
 //                 <div className="profile-section1">
 //                   <div className="BORD">
@@ -298,55 +302,25 @@
 //                       <span className="username">Settings</span>
 //                     </div>{" "}
 //                     <br />
-//                     <div style={{ display: "flex", gap: "14%", width: "100%" }}>
-//                       <img
-//                         src={`src/assets/icons/left-arrow.png`}
-//                         alt="Profile"
-//                         className="profile-pic1"
-//                       />
-//                       <span className="username">Logout</span>
-//                     </div>
+//                     {isAuthenticated && (
+//                       <div style={{ display: "flex", gap: "14%", width: "100%" }}>
+//                         <img
+//                           src={`src/assets/icons/left-arrow.png`}
+//                           alt="Profile"
+//                           className="profile-pic1"
+//                         />
+//                         <LogoutButton />
+//                       </div>
+//                     )}
 //                   </div>
-//                   <div></div>
 //                 </div>
-                
 //               </div>
 //             )}
 //           </div>
 
-//           <button className="sell-button " onClick={()=>navigate("/sell")}>
-//             <svg
-//               width="100"
-//               height="40"
-//               viewBox="0 0 100 40"
-//               preserveAspectRatio="none"
-//             >
-//               <defs>
-//                 <linearGradient
-//                   id="splitBorder"
-//                   x1="0%"
-//                   y1="0%"
-//                   x2="100%"
-//                   y2="0%"
-//                 >
-//                   <stop offset="50%" stopColor="#facc15" />
-//                   <stop offset="50%" stopColor="#1e40af" />
-//                 </linearGradient>
-//               </defs>
-//               <rect
-//                 x="2"
-//                 y="2"
-//                 width="96"
-//                 height="36"
-//                 rx="18"
-//                 ry="18"
-//                 fill="#ffffff"
-//                 stroke="url(#splitBorder)"
-//                 strokeWidth="4"
-//               />
-//             </svg>
-//             <span className="sell-button-text">+ SELL</span>
-//           </button>
+
+//             <img src="/addButton.png" alt="sdsda" srcset="" className=" w-18 " onClick={() => navigate("/sell")}/>
+//           {/* </button> */}
 //         </div>
 //       </div>
 
@@ -406,19 +380,26 @@
 
 
 
+
 import React, { useState, useEffect } from "react";
 import "./Navbar.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import LoginButton from "../auth/login/Login";
 import LogoutButton from "../auth/logout/Logout";
-import Profile from "../auth/profile/Profile";
 
 const Navbar = () => {
   const { user, isAuthenticated, isLoading } = useAuth0();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const query = searchParams.get("search") || "";
+    setSearchQuery(query);
+  }, [searchParams]);
 
   // Store user email in localStorage when authenticated
   useEffect(() => {
@@ -435,17 +416,16 @@ const Navbar = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
+  const handleSearch = (e) => {
+    e.preventDefault();
+    // Navigate to homepage with search query as URL parameter
+    navigate(`/?search=${encodeURIComponent(searchQuery)}`);
+  };
+
   const categories = [
     {
       title: "Cars",
-      items: [
-        "Cars",
-        "Bikes",
-        "Motorcycles",
-        "Scooters",
-        "Bicycle",
-        "Spare Parts",
-      ],
+      items: ["Cars", "Bikes", "Motorcycles", "Scooters", "Bicycle", "Spare Parts"],
     },
     {
       title: "Properties",
@@ -507,12 +487,7 @@ const Navbar = () => {
     },
     {
       title: "Pets",
-      items: [
-        "Fishes & Aquarium",
-        "Pet Food & Accessories",
-        "Dogs",
-        "Other Pets",
-      ],
+      items: ["Fishes & Aquarium", "Pet Food & Accessories", "Dogs", "Other Pets"],
     },
     {
       title: "Services",
@@ -556,7 +531,6 @@ const Navbar = () => {
   return (
     <nav>
       <div className="nav-top">
-        {/* Left Section: Logo and Location Dropdown */}
         <div className="nav-left">
           <img src="src/assets/images/olx_logo_2025.svg" alt="OLX Logo" />
           <div className="relative">
@@ -567,9 +541,14 @@ const Navbar = () => {
         </div>
 
         <div className="nav-search">
-          <div className="search-container">
-            <input type="text" placeholder='Search "Cars"' />
-            <button>
+          <form onSubmit={handleSearch} className="search-container">
+            <input
+              type="text"
+              placeholder='Search "Cars"'
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <button type="submit">
               <svg
                 fill="none"
                 stroke="currentColor"
@@ -584,7 +563,7 @@ const Navbar = () => {
                 ></path>
               </svg>
             </button>
-          </div>
+          </form>
         </div>
 
         <div className="nav-right">
@@ -645,9 +624,7 @@ const Navbar = () => {
                             alt="Profile"
                             className="profile-pic"
                           />
-                          <span className="username truncate">
-                            {user.name}
-                          </span>
+                          <span className="username truncate">{user.name}</span>
                         </>
                       ) : (
                         <span className="username">Guest</span>
@@ -666,7 +643,7 @@ const Navbar = () => {
                         className="profile-pic1"
                       />
                       <span className="username">My ADS</span>
-                    </div>{" "}
+                    </div>
                     <br />
                     <div style={{ display: "flex", gap: "14%", width: "100%" }}>
                       <img
@@ -675,7 +652,7 @@ const Navbar = () => {
                         className="profile-pic1"
                       />
                       <span className="username">Buy Business Packages</span>
-                    </div>{" "}
+                    </div>
                     <br />
                     <div style={{ display: "flex", gap: "14%", width: "100%" }}>
                       <img
@@ -683,9 +660,7 @@ const Navbar = () => {
                         alt="Profile"
                         className="profile-pic1"
                       />
-                      <span className="username">
-                        Bought Packages & Billing
-                      </span>
+                      <span className="username">Bought Packages & Billing</span>
                     </div>
                   </div>
                 </div>
@@ -699,7 +674,7 @@ const Navbar = () => {
                         className="profile-pic1"
                       />
                       <span className="username">Help</span>
-                    </div>{" "}
+                    </div>
                     <br />
                     <div style={{ display: "flex", gap: "14%", width: "100%" }}>
                       <img
@@ -708,7 +683,7 @@ const Navbar = () => {
                         className="profile-pic1"
                       />
                       <span className="username">Settings</span>
-                    </div>{" "}
+                    </div>
                     <br />
                     {isAuthenticated && (
                       <div style={{ display: "flex", gap: "14%", width: "100%" }}>
@@ -726,40 +701,12 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* <button className="sell-button" onClick={() => navigate("/sell")}> */}
-            {/* <svg
-              width="100"
-              height="40"
-              viewBox="0 0 100 40"
-              preserveAspectRatio="none"
-            >
-              <defs>
-                <linearGradient
-                  id="splitBorder"
-                  x1="0%"
-                  y1="0%"
-                  x2="100%"
-                  y2="0%"
-                >
-                  <stop offset="50%" stopColor="#facc15" />
-                  <stop offset="50%" stopColor="#1e40af" />
-                </linearGradient>
-              </defs>
-              <rect
-                x="2"
-                y="2"
-                width="96"
-                height="36"
-                rx="18"
-                ry="18"
-                fill="#ffffff"
-                stroke="url(#splitBorder)"
-                strokeWidth="4"
-              />
-            </svg>
-            <span className="sell-button-text">+ SELL</span> */}
-            <img src="/addButton.png" alt="sdsda" srcset="" className=" w-18 " onClick={() => navigate("/sell")}/>
-          {/* </button> */}
+          <img
+            src="/addButton.png"
+            alt="Sell"
+            className="w-18 cursor-pointer"
+            onClick={() => navigate("/sell")}
+          />
         </div>
       </div>
 

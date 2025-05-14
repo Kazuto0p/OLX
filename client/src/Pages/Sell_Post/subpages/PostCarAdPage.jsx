@@ -158,7 +158,14 @@ const PostCarAdPage = () => {
             label="Brand"
             value={formData.brand}
             onChange={e => updateField('brand', e.target.value)}
-            options={['Toyota','Honda','Ford']}
+            options={ [
+              'Toyota', 'Honda', 'Ford', 'Chevrolet', 'Hyundai', 'Nissan', 'Volkswagen', 
+              'Kia', 'BMW', 'Mercedes-Benz', 'Audi', 'Lexus', 'Mazda', 'Jeep', 'Subaru',
+              'Renault', 'Peugeot', 'Fiat', 'Skoda', 'Tata', 'Mahindra', 'Maruti Suzuki',
+              'Volvo', 'Jaguar', 'Land Rover', 'Mitsubishi', 'Porsche', 'Tesla', 'Isuzu',
+              'Datsun', 'Mini', 'Cadillac', 'Buick', 'Chrysler', 'Acura', 'Infiniti',
+              'Genesis', 'Daewoo', 'Alfa Romeo', 'Citroën', 'Lamborghini'
+            ]}
           />
           <InputField label="Year *" type="number" value={formData.year} onChange={e => updateField('year', e.target.value)} placeholder="e.g. 2022" />
           <OptionButtons label="Fuel *" field="fuel" value={formData.fuel} options={['CNG & Hybrids','Diesel','Electric','LPG','Petrol']} onSelect={updateField} />
@@ -185,7 +192,45 @@ const PostCarAdPage = () => {
             label="State"
             value={formData.location}
             onChange={e => updateField('location', e.target.value)}
-            options={['Maharashtra','Delhi','Karnataka']}
+            options={ [
+              "Andhra Pradesh",
+              "Arunachal Pradesh",
+              "Assam",
+              "Bihar",
+              "Chhattisgarh",
+              "Goa",
+              "Gujarat",
+              "Haryana",
+              "Himachal Pradesh",
+              "Jharkhand",
+              "Karnataka",
+              "Kerala",
+              "Madhya Pradesh",
+              "Maharashtra",
+              "Manipur",
+              "Meghalaya",
+              "Mizoram",
+              "Nagaland",
+              "Odisha",
+              "Punjab",
+              "Rajasthan",
+              "Sikkim",
+              "Tamil Nadu",
+              "Telangana",
+              "Tripura",
+              "Uttar Pradesh",
+              "Uttarakhand",
+              "West Bengal",
+              // Union Territories
+              "Andaman and Nicobar Islands",
+              "Chandigarh",
+              "Dadra and Nagar Haveli and Daman and Diu",
+              "Delhi",
+              "Jammu and Kashmir",
+              "Ladakh",
+              "Lakshadweep",
+              "Puducherry"
+            ]}
             link="Current Location"
           />
         </section>

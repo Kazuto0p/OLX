@@ -726,7 +726,7 @@ const Navbar = () => {
             )}
           </div>
 
-          <button className="sell-button" onClick={() => navigate("/sell")}>
+          {/* <button className="sell-button" onClick={() => navigate("/sell")}> */}
             {/* <svg
               width="100"
               height="40"
@@ -758,8 +758,8 @@ const Navbar = () => {
               />
             </svg>
             <span className="sell-button-text">+ SELL</span> */}
-            <img src="/assets/images/addButton.png" alt="" srcset="" />
-          </button>
+            <img src="/addButton.png" alt="sdsda" srcset="" className=" w-18 " onClick={() => navigate("/sell")}/>
+          {/* </button> */}
         </div>
       </div>
 

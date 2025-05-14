@@ -38,7 +38,7 @@ const Post = () => {
             <div>
                 <h2 className="text-[24px] font-bold text-center">POST YOUR AD</h2>
             </div>
-            <div className="w-[852px] h-180 mx-auto border">
+            <div className="w-[852px] h-120 mx-auto border">
                 <div className="w-[851px] h-15 mx-auto flex items-center pt-6 pr-[30px] pb-4 pl-[30px] border-r border-b-0">
                     CHOOSE A CATEGORY
                 </div>

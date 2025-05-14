@@ -1,0 +1,94 @@
+import Post from '../models/post.model.js';
+
+export async function addPost(req, res) {
+  try {
+    const files = req.files || [];
+    if (files.length === 0) {
+      return res.status(400).json({ message: 'At least one photo is required.' });
+    }
+    const {
+      brand = '',
+      year,
+      fuel = '',
+      transmission = '',
+      kmDriven,
+      owners = '',
+      adTitle = '',
+      description = '',
+      price = '',
+      location = '',
+      phone = '',
+    } = req.body;
+    if (!adTitle || !description || !price || !location) {
+      return res.status(400).json({ message: 'Required fields are missing.' });
+    }
+    const photos = files.map(file => file.path);
+    const newPost = await Post.create({
+      brand: brand.trim(),
+      year: year ? Number(year) : undefined,
+      fuel,
+      transmission,
+      kmDriven: kmDriven ? Number(kmDriven) : undefined,
+      owners,
+      adTitle: adTitle.trim(),
+      description: description.trim(),
+      price: Number(price),
+      location: location.trim(),
+      phone: phone.trim(),
+      photos,
+    });
+    return res.status(201).json({ message: 'Post created successfully', data: newPost });
+  } catch (error) {
+    console.error('addPost error:', error.stack || error);
+    return res.status(500).json({ message: 'Internal Server Error', error: error.message });
+  }
+}
+
+export async function addPost1(req, res) {
+  try {
+    const files = req.files || [];
+    if (files.length === 0) {
+      return res.status(400).json({ message: 'At least one photo is required.' });
+    }
+
+    const { adTitle = '', description = '', price = '', location = '', phone = '', brand = '', year, fuel = '', transmission = '', kmDriven, owners = '' } = req.body;
+
+    if (!adTitle || !description || !price || !location) {
+      return res.status(400).json({ message: 'Missing adTitle, description, price or location.' });
+    }
+
+    const photos = files.map(f => f.path);
+
+    const newPost = await Post.create({
+      adTitle: adTitle.trim(),
+      description: description.trim(),
+      price: Number(price),
+      location: location.trim(),
+      phone: phone.trim(),
+      brand: brand.trim(),
+      year: year ? Number(year) : undefined,
+      fuel,
+      transmission,
+      kmDriven: kmDriven ? Number(kmDriven) : undefined,
+      owners,
+      photos
+    });
+
+    return res.status(201).json({ message: 'Post created successfully', data: newPost });
+  } catch (err) {
+    console.error('addPost error:', err);
+    return res.status(500).json({ message: 'Internal Server Error', error: err.message });
+  }
+}
+
+
+export async function loadpost(req, res) {
+  try {
+    const posts = await Post.find().sort({ createdAt: -1 });
+    console.log('Loading posts:', posts);
+    return res.status(200).json({ message: 'Success', data: posts });
+  } catch (error) {
+    console.error('loadpost error:', error.stack || error);
+    return res.status(500).json({ message: 'Server side error', error: error.message });
+  }
+}

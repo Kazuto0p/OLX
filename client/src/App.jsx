@@ -19,7 +19,7 @@ const App = () => {
   return (
     <div>
       <BrowserRouter>
-        <AuthRestore />
+        {/* <AuthRestore /> */}
         <Routes>
           <Route
             path="/"

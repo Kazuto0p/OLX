@@ -64,7 +64,7 @@ export async function addPost(req, res) {
 export async function loadpost(req, res) {
   try {
     const posts = await Post.find().sort({ createdAt: -1 });
-    console.log('Loading posts:', posts);
+    // console.log('Loading posts:', posts);
     return res.status(200).json({ message: 'Success', data: posts });
   } catch (error) {
     console.error('Error loading posts:', error);
@@ -87,3 +87,6 @@ export async function getPostById(req, res) {
     return res.status(500).json({ message: 'Server side error', error: error.message });
   }
 }
+
+
+

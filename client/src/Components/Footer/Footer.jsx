@@ -1,30 +1,60 @@
 import React from 'react';
-import './FooterTailwind.css'
-// import '/home/synnefo/OLX/client/tailwind.config.js'
+import './FooterTailwind.css';
 
 const Footer = () => {
   return (
-    <footer className="bg-[rgb(0,_72,_150)] border-t border-gray-200 py-6 h-auto p-16">
-      <div className="flex justify-between w-full gap-x-8">
-        <div className="flex-[2] p-4 flex items-center border-r border-white">
-          <img
-            className="w-full h-full object-cover"
-            src="src/assets/images/cartrade_tech_1.svg"
-            alt="Logo"
-          />
+    <footer className="bg-footer-blue border-t border-gray-200 py-6">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6 mb-6">
+          <div className="flex justify-center items-center p-2">
+            <img
+              className="max-w-[120px] sm:max-w-[140px] h-auto object-contain"
+              src="/images/cartrade_tech_1.svg"
+              alt="CarTrade Tech Logo"
+            />
+          </div>
+          <div className="flex justify-center items-center p-2">
+            <img
+              className="max-w-[120px] sm:max-w-[140px] h-auto object-contain"
+              src="/images/olx_2025.svg"
+              alt="OLX Logo"
+            />
+          </div>
+          <div className="flex justify-center items-center p-2">
+            <img
+              className="max-w-[120px] sm:max-w-[140px] h-auto object-contain"
+              src="/images/carwale.svg"
+              alt="CarWale Logo"
+            />
+          </div>
+          <div className="flex justify-center items-center p-2">
+            <img
+              className="max-w-[120px] sm:max-w-[140px] h-auto object-contain"
+              src="/images/bikewale.svg"
+              alt="BikeWale Logo"
+            />
+          </div>
+          <div className="flex justify-center items-center p-2">
+            <img
+              className="max-w-[120px] sm:max-w-[140px] h-auto object-contain"
+              src="/images/cartrade.svg"
+              alt="CarTrade Logo"
+            />
+          </div>
+          <div className="flex justify-center items-center p-2">
+            <img
+              className="max-w-[120px] sm:max-w-[140px] h-auto object-contain"
+              src="/images/mobility.svg"
+              alt="Mobility Logo"
+            />
+          </div>
         </div>
-        <div className="flex-1 p-4 items-center"><img className="w-full h-full object-contain" src="src/assets/images/olx_2025.svg" alt="" srcset="" /></div>
-        <div className="flex-1 p-4 items-center"><img className="w-full h-full object-contain" src="src/assets/images/carwale.svg" alt="" srcset="" /></div>
-        <div className="flex-1 p-4 items-center"><img className="w-full h-full object-contain" src="src/assets/images/bikewale.svg" alt="" srcset="" /></div>
-        <div className="flex-1 p-4 items-center"><img className="w-full h-full object-contain" src="src/assets/images/cartrade.svg" alt="" srcset="" /></div>
-        <div className="flex-1 p-4 items-center"><img className="w-full h-full object-contain" src="src/assets/images/mobility.svg" alt="" srcset="" /></div>
-      </div>
-      <div className='flex justify-between text-white' >
-        <div className=' text-[12px] '>Help - Sitemap</div>
-        <div className=' text-[12px] '>All rights reserved © 2006-2025 OLX</div>
+        <div className="flex flex-col sm:flex-row justify-between items-center text-white text-xs sm:text-sm gap-4 sm:gap-0">
+          <div>Help - Sitemap</div>
+          <div>All rights reserved © 2006-2025 OLX</div>
+        </div>
       </div>
     </footer>
-
   );
 };
 

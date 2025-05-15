@@ -6,3 +6,7 @@
 @tailwind utilities; */
 
 /* Omit @tailwind components if you don't want default components */
+/* Custom background color for footer */
+.bg-footer-blue {
+    background-color: rgb(0, 72, 150);
+  }

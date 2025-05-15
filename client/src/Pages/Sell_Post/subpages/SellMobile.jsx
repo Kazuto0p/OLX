@@ -99,7 +99,7 @@ const SellMobile = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:8080/api/posts', formDataToSend, {
+      const response = await axios.post('http://localhost:3000/api/posts', formDataToSend, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setSuccess(response.data.message);

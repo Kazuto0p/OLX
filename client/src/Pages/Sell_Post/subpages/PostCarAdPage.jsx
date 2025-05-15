@@ -131,7 +131,7 @@ const PostCarAdPage = () => {
       photos.forEach((file) => {
         data.append('photos', file);
       });
-      const res = await fetch('http://localhost:8080/api/posts', {
+      const res = await fetch('http://localhost:3000/api/posts', {
         method: 'POST',
         body: data
       });

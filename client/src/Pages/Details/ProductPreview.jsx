@@ -15,7 +15,7 @@ const ProductPreview = () => {
   useEffect(() => {
     async function fetchPost() {
       try {
-        const res = await axios.get(`http://localhost:8080/api/post/${id}`);
+        const res = await axios.get(`http://localhost:3000/api/post/${id}`);
         setPost(res.data.data);
       } catch (err) {
         console.error('Error fetching post:', err);
@@ -81,7 +81,7 @@ const ProductPreview = () => {
             <img
               src={
                 post.photos?.[currentImageIndex]
-                  ? `http://localhost:8080/${post.photos[currentImageIndex]}`
+                  ? `http://localhost:3000/${post.photos[currentImageIndex]}`
                   : 'https://picsum.photos/600/400'
               }
               alt="Product"

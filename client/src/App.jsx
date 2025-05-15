@@ -14,6 +14,7 @@ import SellBike from './Pages/Sell_Post/subpages/SellBike';
 import SellMobile from './Pages/Sell_Post/subpages/SellMobile';
 import SellLaptop from './Pages/Sell_Post/subpages/SellLaptop';
 import ProductPreview from './Pages/Details/ProductPreview';
+import WishList from './Pages/WishList/WishList';
 
 const App = () => {
   return (
@@ -87,6 +88,7 @@ const App = () => {
               </>
             }
           />
+          <Route path='/wishlist' element={<> <Navbar /> <WishList /> <Footer/></>} />
           {/* Keep commented route for reference */}
           {/* <Route path="/cars" element={<><Nav2 /><Carr /></>} /> */}
         </Routes>

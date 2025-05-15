@@ -1,36 +1,27 @@
 import express from "express";
 import upload from "../multer/multer.config.js";
-import { addPost,getPostById,loadpost } from "../controller/post.js";
-
+import { addPost, getPostById, loadpost, userlog } from "../controller/post.js";
+import {
+  getWishlist,
+  getWishlistIds,
+  addToWishlist,
+  removeFromWishlist,
+  toggleWishlist
+} from "../controller/post.js";
 
 const router = express.Router();
 
-router.post('/posts',upload.array('photos', 20),  addPost);
+// Post routes
+router.post('/posts', upload.array('photos', 20), addPost);
+router.get('/loadposts', loadpost);
+router.post('/signin', userlog);
+router.get('/post/:id', getPostById);
 
-router.get('/loadposts',loadpost)
-router.get('/post/:id',getPostById)
+// Wishlist routes - all protected by authentication
+router.get('/wishlist', getWishlist);
+router.get('/wishlist/ids/:userId', getWishlistIds);
+router.post('/wishlist/add', addToWishlist);
+router.delete('/wishlist/remove/:postId', removeFromWishlist);
+router.post('/wishlist/toggle/:postId/:uid', toggleWishlist);
 
 export default router;
-
-// import express from "express";
-// import upload from "../multer/multer.config.js";
-// import { addPost, getPostById, loadpost } from "../controller/post.js";
-// import {
-//   getFavorites,
-//   getFavoritePosts,
-//   addFavorite,
-//   removeFavorite,
-// } from "../controller/controllers_favorite.js";
-
-// const router = express.Router();
-
-// router.post('/posts', upload.array('photos', 20), addPost);
-// router.get('/loadposts', loadpost);
-// router.get('/post/:id', getPostById);
-
-// router.get('/favorites', getFavorites);
-// router.get('/favorites/posts', getFavoritePosts);
-// router.post('/favorites', addFavorite);
-// router.delete('/favorites/:postId', removeFavorite);
-
-// export default router;

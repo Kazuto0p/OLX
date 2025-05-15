@@ -6,493 +6,207 @@ import { useAuth0 } from '@auth0/auth0-react';
 const Card = () => {
   const [posts, setPosts] = useState([]);
   const [filteredPosts, setFilteredPosts] = useState([]);
-  const [favorites, setFavorites] = useState(new Set());
+  const [wishlist, setWishlist] = useState(new Set());
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { isAuthenticated, getAccessTokenSilently } = useAuth0();
+  const { isAuthenticated, loginWithRedirect } = useAuth0();
 
   const postsPerPage = 6;
-  const totalPosts = filteredPosts.length;
-  const totalPages = Math.ceil(totalPosts / postsPerPage);
+  const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
 
-  async function loadData() {
+  const loadPosts = async () => {
     try {
-      const res = await axios.get('http://localhost:3000/api/loadposts');
-      setPosts(res.data.data);
+      const { data } = await axios.get('http://localhost:3000/api/loadposts');
+      setPosts(data.data);
     } catch (err) {
       console.error('Error loading posts:', err);
       setError('Failed to load posts.');
     }
-  }
+  };
 
-  // async function loadFavorites() {
-  //   if (!isAuthenticated) return;
-  //   try {
-  //     const token = await getAccessTokenSilently();
-  //     const res = await axios.get('http://localhost:3000/api/favorites', {
-  //       headers: { Authorization: `Bearer ${token}` },
-  //     });
-  //     setFavorites(new Set(res.data.favoritePostIds || []));
-  //   } catch (err) {
-  //     console.error('Error loading favorites:', err);
-  //     setError('Failed to load favorites.');
-  //   }
-  // }
+  const loadWishlist = async () => {
+    const uid = localStorage.getItem("id")
+    try {
+      const { data } = await axios.get(`http://localhost:3000/api/wishlist/ids/${uid}`);
+      setWishlist(new Set(data.wishlistIds));
+    } catch (err) {
+      console.error('Error loading wishlist:', err);
+    }
+  };
 
-  async function toggleFavorite(postId) {
+  const toggleWishlist = async (postId, e) => {
+    e.stopPropagation();
     if (!isAuthenticated) {
-      setError('Please log in to add to wishlist.');
+      if (window.confirm('Please log in to add items to your wishlist. Would you like to log in now?')) {
+        loginWithRedirect();
+      }
       return;
     }
 
-    const isFavorited = favorites.has(postId);
-    const newFavorites = new Set(favorites);
-
     try {
-      const token = await getAccessTokenSilently();
-      if (isFavorited) {
-        await axios.delete(`http://localhost:3000/api/favorites/${postId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        newFavorites.delete(postId);
-      } else {
-        await axios.post(
-          'http://localhost:3000/api/favorites',
-          { postId },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        newFavorites.add(postId);
-      }
-      setFavorites(newFavorites);
+      const uid = localStorage.getItem('id');
+      const { data } = await axios.post(`http://localhost:3000/api/wishlist/toggle/${postId}/${uid}`);
+      setWishlist(prev => {
+        const newWishlist = new Set(prev);
+        data.added ? newWishlist.add(postId) : newWishlist.delete(postId);
+        return newWishlist;
+      });
     } catch (err) {
-      console.error('Error toggling favorite:', err);
-      setError(`Failed to ${isFavorited ? 'remove from' : 'add to'} wishlist.`);
+      console.error('Error toggling wishlist:', err);
+      setError('Failed to update wishlist. Please try again.');
+      setTimeout(() => setError(''), 3000);
     }
-  }
+  };
 
   useEffect(() => {
-    loadData();
-    // loadFavorites();
+    loadPosts();
+    loadWishlist();
   }, [isAuthenticated]);
 
   useEffect(() => {
     const query = searchParams.get('search')?.toLowerCase() || '';
-    if (query) {
-      const filtered = posts.filter((post) =>
-        (post.adTitle?.toLowerCase() || '').includes(query)
-      );
-      setFilteredPosts(filtered);
-    } else {
-      setFilteredPosts(posts);
-    }
+    setFilteredPosts(
+      query
+        ? posts.filter(post => post.adTitle?.toLowerCase().includes(query))
+        : posts
+    );
     setCurrentPage(1);
   }, [posts, searchParams]);
 
-  const indexOfLastPost = currentPage * postsPerPage;
-  const indexOfFirstPost = indexOfLastPost - postsPerPage;
-  const itemsToShow = filteredPosts.slice(indexOfFirstPost, indexOfLastPost);
-
-  const handlePageChange = (pageNumber) => {
+  const handlePageChange = pageNumber => {
     setCurrentPage(pageNumber);
+    window.scrollTo(0, 0);
+  };
+
+  const paginatedPosts = filteredPosts.slice(
+    (currentPage - 1) * postsPerPage,
+    currentPage * postsPerPage
+  );
+
+  const renderPagination = () => {
+    if (filteredPosts.length <= postsPerPage) return null;
+
+    const pages = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let page = startPage; page <= endPage; page++) {
+      pages.push(
+        <button
+          key={page}
+          onClick={() => handlePageChange(page)}
+          className={`px-4 py-2 rounded-lg ${
+            currentPage === page
+              ? 'bg-blue-600 text-white'
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          } transition`}
+        >
+          {page}
+        </button>
+      );
+    }
+
+    return (
+      <div className="mt-6 flex justify-center space-x-2">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50 hover:bg-blue-700 transition"
+        >
+          Previous
+        </button>
+        {pages}
+        {endPage < totalPages && (
+          <>
+            <span className="px-2 py-2">...</span>
+            <button
+              onClick={() => handlePageChange(totalPages)}
+              className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition"
+            >
+              {totalPages}
+            </button>
+          </>
+        )}
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50 hover:bg-blue-700 transition"
+        >
+          Next
+        </button>
+      </div>
+    );
   };
 
   return (
     <div className="p-4">
       <h2 className="text-2xl font-bold mb-4">Latest Posts</h2>
 
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-      {filteredPosts.length === 0 && !error && (
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {error}
+        </div>
+      )}
+
+      {!error && paginatedPosts.length === 0 && (
         <p className="text-gray-600">No posts found.</p>
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {itemsToShow.map((post, index) => (
+        {paginatedPosts.map(post => (
           <div
-            key={index}
-            className="relative bg-white shadow-md border p-4 cursor-pointer hover:shadow-lg transition"
+            key={post._id}
+            className="relative bg-white shadow-md border rounded-lg p-4 cursor-pointer hover:shadow-lg transition"
             onClick={() => navigate(`/product/${post._id}`)}
           >
             <img
-              src={
-                post.photos?.[0]
-                  ? `http://localhost:3000/${post.photos[0]}`
-                  : 'https://picsum.photos/200/150'
-              }
-              alt="Post"
+              src={post.photos?.[0] ? `http://localhost:3000/${post.photos[0]}` : 'https://picsum.photos/200/150'}
+              alt={post.adTitle}
               className="w-full h-48 rounded-md mb-3 object-contain"
-              onError={(e) => {
-                e.target.src = 'https://picsum.photos/200/150';
-              }}
+              onError={e => (e.target.src = 'https://picsum.photos/200/150')}
             />
-
-            <div className="absolute top-2 right-2 bg-sky-200 w-[36px] h-[36px] rounded-full flex items-center justify-center">
-              <button
-                type="button"
-                title={favorites.has(post._id) ? 'Remove from Wishlist' : 'Add to Wishlist'}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleFavorite(post._id);
-                }}
+            <button
+              type="button"
+              title={wishlist.has(post._id) ? 'Remove from Wishlist' : 'Add to Wishlist'}
+              onClick={e => toggleWishlist(post._id, e)}
+              className="absolute top-2 right-2 bg-white bg-opacity-75 w-9 h-9 rounded-full flex items-center justify-center shadow-sm hover:bg-opacity-100 transition-all"
+            >
+              {/* <svg
+                width="20"
+                height="20"
+                viewBox="0 0 1024 1024"
+                fill={wishlist.has(post._id) ? '#000' : 'none'}
+                stroke={wishlist.has(post._id) ? 'none' : 'currentColor'}
+                strokeWidth="2"
+                className="transition-all"
               >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 1024 1024"
-                  fill={favorites.has(post._id) ? '#ff0000' : 'currentColor'}
-                >
-                  <path
-                    d="M830.798 448.659l-318.798 389.915-317.828-388.693c-20.461-27.171-31.263-59.345-31.263-93.033 
-                    0-85.566 69.605-155.152 155.152-155.152 72.126 0 132.752 49.552 150.051 116.364h87.777c17.299-66.812 
-                    77.905-116.364 150.051-116.364 85.547 0 155.152 69.585 155.152 155.152 0 33.687-10.802 65.862-30.293 
-                    91.811zM705.939 124.121c-80.853 0-152.204 41.425-193.939 104.204-41.736-62.778-113.086-104.204-193.939-104.204-128.33 
-                    0-232.727 104.378-232.727 232.727 0 50.657 16.194 98.948 47.806 140.897l328.766 
-                    402.133h100.189l329.716-403.355c30.662-40.727 46.856-89.018 46.856-139.675 
-                    0-128.349-104.398-232.727-232.727-232.727z"
-                  />
-                </svg>
-              </button>
-            </div>
-
+                <path d="M830.798 448.659l-318.798 389.915-317.828-388.693c-20.461-27.171-31.263-59.345-31.263-93.033 0-85.566 69.605-155.152 155.152-155.152 72.126 0 132.752 49.552 150.051 116.364h87.777c17.299-66.812 77.905-116.364 150.051-116.364 85.547 0 155.152 69.585 155.152 155.152 0 33.687-10.802 65.862-30.293 91.811zM705.939 124.121c-80.853 0-152.204 41.425-193.939 104.204-41.736-62.778-113.086-104.204-193.939-104.204-128.33 0-232.727 104.378-232.727 232.727 0 50.657 16.194 98.948 47.806 140.897l328.766 402.133h100.189l329.716-403.355c30.662-40.727 46.856-89.018 46.856-139.675 0-128.349-104.398-232.727-232.727-232.727z" />
+              </svg> */}
+              <img
+              src={'/wish.png'}
+              alt={post.adTitle}
+              className="w-full h-48 rounded-md mb-3 object-contain"
+              onError={e => (e.target.src = 'https://picsum.photos/200/150')}
+            />
+            </button>
             <h3 className="text-lg font-semibold mb-1">₹{post.price}</h3>
             <p className="text-sm font-medium">{post.adTitle}</p>
-            <p className="text-sm text-gray-600 mb-1">{post.description}</p>
+            <p className="text-sm text-gray-600 mb-1 line-clamp-2">{post.description}</p>
             <p className="text-xs text-gray-400 mt-2">{post.location}</p>
           </div>
         ))}
       </div>
 
-      {filteredPosts.length > postsPerPage && (
-        <div className="mt-6 flex justify-center space-x-2">
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:bg-gray-300 hover:bg-blue-700 transition"
-          >
-            Previous
-          </button>
-
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <button
-              key={page}
-              onClick={() => handlePageChange(page)}
-              className={`px-4 py-2 rounded-lg ${
-                currentPage === page
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              } transition`}
-            >
-              {page}
-            </button>
-          ))}
-
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:bg-gray-300 hover:bg-blue-700 transition"
-          >
-            Next
-          </button>
-        </div>
-      )}
+      {renderPagination()}
     </div>
   );
 };
 
 export default Card;
-
-// import React, { useEffect, useState } from 'react';
-// import axios from 'axios';
-// import { useSearchParams, useNavigate } from 'react-router-dom';
-
-// const Card = () => {
-//   const [posts, setPosts] = useState([]);
-//   const [filteredPosts, setFilteredPosts] = useState([]);
-//   const [error, setError] = useState('');
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const [searchParams] = useSearchParams();
-//   const navigate = useNavigate();
-  
-//   const postsPerPage = 6; 
-//   const totalPosts = filteredPosts.length;
-//   const totalPages = Math.ceil(totalPosts / postsPerPage);
-
-//   async function loadData() {
-//     try {
-//       const res = await axios.get("http://localhost:3000/api/loadposts");
-//       setPosts(res.data.data);
-//     } catch (err) {
-//       console.error('Error loading posts:', err);
-//       setError('Failed to load posts.');
-//     }
-//   }
-
-//   useEffect(() => {
-//     loadData();
-//   }, []);
-
-//   useEffect(() => {
-//     const query = searchParams.get('search')?.toLowerCase() || '';
-//     if (query) {
-//       const filtered = posts.filter((post) =>
-//         (post.adTitle?.toLowerCase() || '').includes(query)
-//       );
-//       setFilteredPosts(filtered);
-//     } else {
-//       setFilteredPosts(posts);
-//     }
-//     setCurrentPage(1); 
-//   }, [posts, searchParams]);
-
-//   const indexOfLastPost = currentPage * postsPerPage;
-//   const indexOfFirstPost = indexOfLastPost - postsPerPage;
-//   const itemsToShow = filteredPosts.slice(indexOfFirstPost, indexOfLastPost);
-
-//   // Handle page change
-//   const handlePageChange = (pageNumber) => {
-//     setCurrentPage(pageNumber);
-//   };
-
-//   return (
-//     <div className="p-4">
-//       <h2 className="text-2xl font-bold mb-4">Latest Posts</h2>
-
-//       {error && <p className="text-red-500 mb-4">{error}</p>}
-//       {filteredPosts.length === 0 && !error && (
-//         <p className="text-gray-600">No posts found.</p>
-//       )}
-
-//       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-//         {itemsToShow.map((post, index) => (
-//           <div
-//             key={index}
-//             className="relative bg-white shadow-md border p-4 cursor-pointer hover:shadow-lg transition"
-//             onClick={() => navigate(`/product/${post._id}`)}
-//           >
-//             <img
-//               src={
-//                 post.photos?.[0]
-//                   ? `http://localhost:3000/${post.photos[0]}`
-//                   : 'https://picsum.photos/200/150'
-//               }
-//               alt="Post"
-//               className="w-full h-48 rounded-md mb-3 object-contain"
-//               onError={(e) => {
-//                 e.target.src = 'https://picsum.photos/200/150';
-//               }}
-//             />
-
-//             <div className="absolute top-2 right-2 bg-sky-200 w-[36px] h-[36px] rounded-full flex items-center justify-center">
-//               <button
-//                 type="button"
-//                 title="Favourite"
-//                 onClick={(e) => {
-//                   e.stopPropagation();
-//                   console.log(`Favorited post: ${post._id}`);
-//                 }}
-//               >
-//                 <svg
-//                   width="20"
-//                   height="20"
-//                   viewBox="0 0 1024 1024"
-//                   fill="currentColor"
-//                 >
-//                   <path
-//                     d="M830.798 448.659l-318.798 389.915-317.828-388.693c-20.461-27.171-31.263-59.345-31.263-93.033 
-//                     0-85.566 69.605-155.152 155.152-155.152 72.126 0 132.752 49.552 150.051 116.364h87.777c17.299-66.812 
-//                     77.905-116.364 150.051-116.364 85.547 0 155.152 69.585 155.152 155.152 0 33.687-10.802 65.862-30.293 
-//                     91.811zM705.939 124.121c-80.853 0-152.204 41.425-193.939 104.204-41.736-62.778-113.086-104.204-193.939-104.204-128.33 
-//                     0-232.727 104.378-232.727 232.727 0 50.657 16.194 98.948 47.806 140.897l328.766 
-//                     402.133h100.189l329.716-403.355c30.662-40.727 46.856-89.018 46.856-139.675 
-//                     0-128.349-104.398-232.727-232.727-232.727z"
-//                   />
-//                 </svg>
-//               </button>
-//             </div>
-
-//             <h3 className="text-lg font-semibold mb-1">₹{post.price}</h3>
-//             <p className="text-sm font-medium">{post.adTitle}</p>
-//             <p className="text-sm text-gray-600 mb-1">{post.description}</p>
-//             <p className="text-xs text-gray-400 mt-2">{post.location}</p>
-//           </div>
-//         ))}
-//       </div>
-
-//       {/* Pagination Controls */}
-//       {filteredPosts.length > postsPerPage && (
-//         <div className="mt-6 flex justify-center space-x-2">
-//           <button
-//             onClick={() => handlePageChange(currentPage - 1)}
-//             disabled={currentPage === 1}
-//             className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:bg-gray-300 hover:bg-blue-700 transition"
-//           >
-//             Previous
-//           </button>
-          
-//           {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-//             <button
-//               key={page}
-//               onClick={() => handlePageChange(page)}
-//               className={`px-4 py-2 rounded-lg ${
-//                 currentPage === page
-//                   ? 'bg-blue-600 text-white'
-//                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-//               } transition`}
-//             >
-//               {page}
-//             </button>
-//           ))}
-          
-//           <button
-//             onClick={() => handlePageChange(currentPage + 1)}
-//             disabled={currentPage === totalPages}
-//             className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:bg-gray-300 hover:bg-blue-700 transition"
-//           >
-//             Next
-//           </button>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default Card;
-
-// import React, { useEffect, useState } from 'react';
-// import axios from 'axios';
-// import { useSearchParams, useNavigate } from 'react-router-dom';
-// import { useAuth0 } from '@auth0/auth0-react';
-
-// const Card = () => {
-//   const [posts, setPosts] = useState([]);
-//   const [filteredPosts, setFilteredPosts] = useState([]);
-//   const [error, setError] = useState('');
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const [searchParams] = useSearchParams();
-//   const navigate = useNavigate();
-//   const { isAuthenticated, getAccessTokenSilently } = useAuth0();
-
-//   const postsPerPage = 6;
-//   const totalPosts = filteredPosts.length;
-//   const totalPages = Math.ceil(totalPosts / postsPerPage);
-
-//   async function loadData() {
-//     try {
-//       if (!isAuthenticated) {
-//         setError('Please log in to view posts.');
-//         return;
-//       }
-//       const token = await getAccessTokenSilently({
-//         audience: 'https://my-cool-api',
-//         scope: 'read:posts', // Optional, omit if not required
-//       });
-//       const res = await axios.get('http://localhost:3000/api/loadposts', {
-//         headers: { Authorization: `Bearer ${token}` },
-//       });
-//       setPosts(res.data.data);
-//     } catch (err) {
-//       console.error('Error loading posts:', err.response?.data, err.response?.status);
-//       setError(err.response?.data?.message || 'Failed to load posts.');
-//     }
-//   }
-
-//   useEffect(() => {
-//     loadData();
-//   }, [isAuthenticated]);
-
-//   useEffect(() => {
-//     const query = searchParams.get('search')?.toLowerCase() || '';
-//     if (query) {
-//       const filtered = posts.filter((post) =>
-//         (post.adTitle?.toLowerCase() || '').includes(query)
-//       );
-//       setFilteredPosts(filtered);
-//     } else {
-//       setFilteredPosts(posts);
-//     }
-//     setCurrentPage(1);
-//   }, [posts, searchParams]);
-
-//   const indexOfLastPost = currentPage * postsPerPage;
-//   const indexOfFirstPost = indexOfLastPost - postsPerPage;
-//   const itemsToShow = filteredPosts.slice(indexOfFirstPost, indexOfLastPost);
-
-//   const handlePageChange = (pageNumber) => {
-//     setCurrentPage(pageNumber);
-//   };
-
-//   return (
-//     <div className="p-4">
-//       <h2 className="text-2xl font-bold mb-4">Latest Posts</h2>
-
-//       {error && <p className="text-red-500 mb-4">{error}</p>}
-//       {filteredPosts.length === 0 && !error && (
-//         <p className="text-gray-600">No posts found.</p>
-//       )}
-
-//       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-//         {itemsToShow.map((post, index) => (
-//           <div
-//             key={index}
-//             className="relative bg-white shadow-md border p-4 cursor-pointer hover:shadow-lg transition"
-//             onClick={() => navigate(`/product/${post._id}`)}
-//           >
-//             <img
-//               src={
-//                 post.photos?.[0]
-//                   ? `http://localhost:3000/${post.photos[0]}`
-//                   : 'https://picsum.photos/200/150'
-//               }
-//               alt="Post"
-//               className="w-full h-48 rounded-md mb-3 object-contain"
-//               onError={(e) => {
-//                 e.target.src = 'https://picsum.photos/200/150';
-//               }}
-//             />
-//             <h3 className="text-lg font-semibold mb-1">₹{post.price}</h3>
-//             <p className="text-sm font-medium">{post.adTitle}</p>
-//             <p className="text-sm text-gray-600 mb-1">{post.description}</p>
-//             <p className="text-xs text-gray-400 mt-2">{post.location}</p>
-//           </div>
-//         ))}
-//       </div>
-
-//       {filteredPosts.length > postsPerPage && (
-//         <div className="mt-6 flex justify-center space-x-2">
-//           <button
-//             onClick={() => handlePageChange(currentPage - 1)}
-//             disabled={currentPage === 1}
-//             className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:bg-gray-300 hover:bg-blue-700 transition"
-//           >
-//             Previous
-//           </button>
-
-//           {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-//             <button
-//               key={page}
-//               onClick={() => handlePageChange(page)}
-//               className={`px-4 py-2 rounded-lg ${
-//                 currentPage === page
-//                   ? 'bg-blue-600 text-white'
-//                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-//               } transition`}
-//             >
-//               {page}
-//             </button>
-//           ))}
-
-//           <button
-//             onClick={() => handlePageChange(currentPage + 1)}
-//             disabled={currentPage === totalPages}
-//             className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:bg-gray-300 hover:bg-blue-700 transition"
-//           >
-//             Next
-//           </button>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default Card;

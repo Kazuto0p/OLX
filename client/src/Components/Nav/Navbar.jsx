@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import LoginButton from "../auth/login/Login";
 import LogoutButton from "../auth/logout/Logout";
+import axios from "axios";
 
 const Navbar = () => {
   const { user, isAuthenticated, isLoading } = useAuth0();
@@ -19,9 +20,24 @@ const Navbar = () => {
     setSearchQuery(query);
   }, [searchParams]);
 
+  async function signin(email, username){
+    try {
+
+      console.log(email, username)
+
+      const res = await axios.post("http://localhost:3000/api/signin",  { email, username },);
+      console.log(res.data)
+      localStorage.setItem("id",res.data._id)
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   useEffect(() => {
     if (isAuthenticated && user?.email) {
       localStorage.setItem("email", user.email);
+      signin(user.email, user.name)
     }
   }, [isAuthenticated, user]);
 
@@ -137,7 +153,7 @@ const Navbar = () => {
           <select>
             <option>ENGLISH</option>
           </select>
-          <button>
+          <button onClick={()=>navigate("/wishlist")}>
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
             </svg>

@@ -1,0 +1,670 @@
+```javascript
+import React, { useEffect, useState, useCallback } from 'react';
+import PropTypes from 'prop-types';
+import axios from 'axios';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useAuth0 } from '@auth0/auth0-react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+// Custom Debounce Hook
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
+const Card = () => {
+  const [posts, setPosts] = useState([]);
+  const [filteredPosts, setFilteredPosts] = useState([]);
+  const [wishlist, setWishlist] = useState(new Set());
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { isAuthenticated, loginWithRedirect } = useAuth0();
+
+  const postsPerPage = 6;
+  const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+
+  const loadPosts = async () => {
+    try {
+      setIsLoading(true);
+      const { data } = await axios.get(`${API_URL}/api/loadposts`);
+      setPosts(data.data);
+    } catch (err) {
+      console.error('Error loading posts:', err);
+      toast.error('Failed to load posts.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loadWishlist = async () => {
+    const uid = localStorage.getItem('id');
+    if (!uid) return;
+    try {
+      const { data } = await axios.get(`${API_URL}/api/wishlist/ids/${uid}`);
+      setWishlist(new Set(data.wishlistIds));
+    } catch (err) {
+      console.error('Error loading wishlist:', err);
+      toast.error('Failed to load wishlist.');
+    }
+  };
+
+  const toggleWishlist = async (postId, e) => {
+    e.stopPropagation();
+    if (!isAuthenticated) {
+      if (window.confirm('Please log in to add items to your wishlist. Would you like to log in now?')) {
+        loginWithRedirect();
+      }
+      return;
+    }
+
+    try {
+      const uid = localStorage.getItem('id');
+      if (!uid) throw new Error('User ID not found');
+      const { data } = await axios.post(`${API_URL}/api/wishlist/toggle/${postId}/${uid}`);
+      setWishlist(prev => {
+        const newWishlist = new Set(prev);
+        data.added ? newWishlist.add(postId) : newWishlist.delete(postId);
+        return newWishlist;
+      });
+      toast.success(data.added ? 'Added to wishlist!' : 'Removed from wishlist.');
+    } catch (err) {
+      console.error('Error toggling wishlist:', err);
+      toast.error('Failed to update wishlist.');
+    }
+  };
+
+  useEffect(() => {
+    loadPosts();
+    loadWishlist();
+  }, [isAuthenticated]);
+
+  const debouncedSearch = useDebounce(searchParams.get('search')?.toLowerCase() || '', 300);
+
+  useEffect(() => {
+    setFilteredPosts(
+      debouncedSearch
+        ? posts.filter(post => post.adTitle?.toLowerCase().includes(debouncedSearch))
+        : posts
+    );
+    setCurrentPage(1);
+  }, [posts, debouncedSearch]);
+
+  const handlePageChange = useCallback(pageNumber => {
+    setCurrentPage(pageNumber);
+    window.scrollTo(0, 0);
+  }, []);
+
+  const paginatedPosts = filteredPosts.slice(
+    (currentPage - 1) * postsPerPage,
+    currentPage * postsPerPage
+  );
+
+  const renderPagination = () => {
+    if (filteredPosts.length <= postsPerPage) return null;
+
+    const pages = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let page = startPage; page <= endPage; page++) {
+      pages.push(
+        <button
+          key={page}
+          onClick={() => handlePageChange(page)}
+          className={`px-4 py-2 rounded-lg ${
+            currentPage === page
+              ? 'bg-blue-600 text-white'
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          } transition`}
+          aria-label={`Go to page ${page}`}
+          aria-current={currentPage === page ? 'page' : undefined}
+        >
+          {page}
+        </button>
+      );
+    }
+
+    return (
+      <nav className="mt-6 flex justify-center space-x-2" aria-label="Pagination">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50 hover:bg-blue-700 transition"
+          aria-label="Previous page"
+          aria-disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+        {pages}
+        {endPage < totalPages && (
+          <>
+            <span className="px-2 py-2" aria-hidden="true">
+              ...
+            </span>
+            <button
+              onClick={() => handlePageChange(totalPages)}
+              className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition"
+              aria-label={`Go to page ${totalPages}`}
+            >
+              {totalPages}
+            </button>
+          </>
+        )}
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50 hover:bg-blue-700 transition"
+          aria-label="Next page"
+          aria-disabled={currentPage === totalPages}
+        >
+          Next
+        </button>
+      </nav>
+    );
+  };
+
+  const renderSkeleton = () => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      {Array.from({ length: postsPerPage }).map((_, index) => (
+        <div
+          key={index}
+          className="bg-white shadow-md border rounded-lg p-4 animate-pulse"
+        >
+          <div className="w-full h-48 bg-gray-200 rounded-md mb-3"></div>
+          <div className="h-6 bg-gray-200 rounded w-1/2 mb-1"></div>
+          <div className="h-4 bg-gray-200 rounded w-3/4 mb-1"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+        </div>
+      ))}
+    </div>
+  );
+
+  return (
+    <div className="p-4">
+      <ToastContainer position="top-right" autoClose={3000} />
+      <h2 className="text-2xl font-bold mb-4">Latest Posts</h2>
+
+      {isLoading ? (
+        renderSkeleton()
+      ) : paginatedPosts.length === 0 ? (
+        <p className="text-gray-600">No posts found.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {paginatedPosts.map(post => (
+            <div
+              key={post._id}
+              className="relative bg-white shadow-md border rounded-lg p-4 cursor-pointer hover:shadow-lg transition"
+              onClick={() => navigate(`/product/${post._id}`)}
+              role="article"
+              aria-label={`View details for ${post.adTitle}`}
+            >
+              <img
+                src={post.photos?.[0] ? `${API_URL}/${post.photos[0]}` : 'https://picsum.photos/200/150'}
+                alt={post.adTitle}
+                className="w-full h-48 rounded-md mb-3 object-contain"
+                onError={e => (e.target.src = 'https://picsum.photos/200/150')}
+                loading="lazy"
+              />
+              <button
+                type="button"
+                onClick={e => toggleWishlist(post._id, e)}
+                className="absolute top-2 right-2 bg-white bg-opacity-75 w-9 h-9 rounded-full flex items-center justify-center shadow-sm hover:bg-opacity-100 transition-all"
+                aria-label={wishlist.has(post._id) ? 'Remove from wishlist' : 'Add to wishlist'}
+                title={wishlist.has(post._id) ? 'Remove from Wishlist' : 'Add to Wishlist'}
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 1024 1024"
+                  fill={wishlist.has(post._id) ? '#000' : 'none'}
+                  stroke={wishlist.has(post._id) ? 'none' : 'currentColor'}
+                  strokeWidth="2"
+                  className="transition-all"
+                >
+                  <path d="M830.798 448.659l-318.798 389.915-317.828-388.693c-20.461-27.171-31.263-59.345-31.263-93.033 0-85.566 69.605-155.152 155.152-155.152 72.126 0 132.752 49.552 150.051 116.364h87.777c17.299-66.812 77.905-116.364 150.051-116.364 85.547 0 155.152 69.585 155.152 155.152 0 33.687-10.802 65.862-30.293 91.811zM705.939 124.121c-80.853 0-152.204 41.425-193.939 104.204-41.736-62.778-113.086-104.204-193.939-104.204-128.33 0-232.727 104.378-232.727 232.727 0 50.657 16.194 98.948 47.806 140.897l328.766 402.133h100.189l329.716-403.355c30.662-40.727 46.856-89.018 46.856-139.675 0-128.349-104.398-232.727-232.727-232.727z" />
+                </svg>
+              </button>
+              <h3 className="text-lg font-semibold mb-1">₹{post.price.toLocaleString()}</h3>
+              <p className="text-sm font-medium">{post.adTitle}</p>
+              <p className="text-sm text-gray-600 mb-1 line-clamp-2">{post.description}</p>
+              <p className="text-xs text-gray-400 mt-2">{post.location}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {renderPagination()}
+    </div>
+  );
+};
+
+// Prop Types for Data Validation
+Card.propTypes = {
+  // No props are passed to Card, but defining for future extensibility
+};
+
+export default Card;
+```
+
+
+
+
+
+
+
+
+-------------------------------------------------------------
+
+
+
+
+Thanks for clarifying that you can't use TypeScript in your project and that you no longer need the unit tests. Since you’ve indicated that TypeScript is not an option, I’ll revise the previously updated `Card.tsx` (now as `Card.jsx`) to remove TypeScript and implement the requested improvements in JavaScript. The improvements will include:
+
+1. **Loading Spinner/Skeleton UI**: Add `isLoading` state with a skeleton UI during API calls.
+2. **Environment Variables**: Use `process.env.REACT_APP_API_URL` for API URLs.
+3. **React-Toastify**: Replace red alert errors with toast notifications.
+4. **ARIA Attributes**: Add accessibility attributes (e.g., `aria-label` for wishlist button).
+5. **Standardized Wishlist Icons**: Use SVG consistently for wishlist toggle.
+6. **Debouncing for Search**: Implement debouncing for search filtering.
+7. **Prop Types**: Add `prop-types` for data validation (since TypeScript isn’t allowed).
+8. **Unit Tests**: Skip unit tests since you’ve indicated they’re not needed.
+
+I’ll provide the updated `Card.jsx` in JavaScript, ensuring all improvements are implemented without TypeScript. Since the unit tests are not needed, I’ll focus solely on the component code. The code will be wrapped in an `<xaiArtifact>` tag with a new `artifact_id` for clarity.
+
+---
+
+### **Updated Card.jsx (JavaScript)**
+
+```javascript
+```javascript
+import React, { useEffect, useState, useCallback } from 'react';
+import PropTypes from 'prop-types';
+import axios from 'axios';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useAuth0 } from '@auth0/auth0-react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+// Custom Debounce Hook
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
+const Card = () => {
+  const [posts, setPosts] = useState([]);
+  const [filteredPosts, setFilteredPosts] = useState([]);
+  const [wishlist, setWishlist] = useState(new Set());
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { isAuthenticated, loginWithRedirect } = useAuth0();
+
+  const postsPerPage = 6;
+  const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+
+  const loadPosts = async () => {
+    try {
+      setIsLoading(true);
+      const { data } = await axios.get(`${API_URL}/api/loadposts`);
+      setPosts(data.data);
+    } catch (err) {
+      console.error('Error loading posts:', err);
+      toast.error('Failed to load posts.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loadWishlist = async () => {
+    const uid = localStorage.getItem('id');
+    if (!uid) return;
+    try {
+      const { data } = await axios.get(`${API_URL}/api/wishlist/ids/${uid}`);
+      setWishlist(new Set(data.wishlistIds));
+    } catch (err) {
+      console.error('Error loading wishlist:', err);
+      toast.error('Failed to load wishlist.');
+    }
+  };
+
+  const toggleWishlist = async (postId, e) => {
+    e.stopPropagation();
+    if (!isAuthenticated) {
+      if (window.confirm('Please log in to add items to your wishlist. Would you like to log in now?')) {
+        loginWithRedirect();
+      }
+      return;
+    }
+
+    try {
+      const uid = localStorage.getItem('id');
+      if (!uid) throw new Error('User ID not found');
+      const { data } = await axios.post(`${API_URL}/api/wishlist/toggle/${postId}/${uid}`);
+      setWishlist(prev => {
+        const newWishlist = new Set(prev);
+        data.added ? newWishlist.add(postId) : newWishlist.delete(postId);
+        return newWishlist;
+      });
+      toast.success(data.added ? 'Added to wishlist!' : 'Removed from wishlist.');
+    } catch (err) {
+      console.error('Error toggling wishlist:', err);
+      toast.error('Failed to update wishlist.');
+    }
+  };
+
+  useEffect(() => {
+    loadPosts();
+    loadWishlist();
+  }, [isAuthenticated]);
+
+  const debouncedSearch = useDebounce(searchParams.get('search')?.toLowerCase() || '', 300);
+
+  useEffect(() => {
+    setFilteredPosts(
+      debouncedSearch
+        ? posts.filter(post => post.adTitle?.toLowerCase().includes(debouncedSearch))
+        : posts
+    );
+    setCurrentPage(1);
+  }, [posts, debouncedSearch]);
+
+  const handlePageChange = useCallback(pageNumber => {
+    setCurrentPage(pageNumber);
+    window.scrollTo(0, 0);
+  }, []);
+
+  const paginatedPosts = filteredPosts.slice(
+    (currentPage - 1) * postsPerPage,
+    currentPage * postsPerPage
+  );
+
+  const renderPagination = () => {
+    if (filteredPosts.length <= postsPerPage) return null;
+
+    const pages = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let page = startPage; page <= endPage; page++) {
+      pages.push(
+        <button
+          key={page}
+          onClick={() => handlePageChange(page)}
+          className={`px-4 py-2 rounded-lg ${
+            currentPage === page
+              ? 'bg-blue-600 text-white'
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          } transition`}
+          aria-label={`Go to page ${page}`}
+          aria-current={currentPage === page ? 'page' : undefined}
+        >
+          {page}
+        </button>
+      );
+    }
+
+    return (
+      <nav className="mt-6 flex justify-center space-x-2" aria-label="Pagination">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50 hover:bg-blue-700 transition"
+          aria-label="Previous page"
+          aria-disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+        {pages}
+        {endPage < totalPages && (
+          <>
+            <span className="px-2 py-2" aria-hidden="true">
+              ...
+            </span>
+            <button
+              onClick={() => handlePageChange(totalPages)}
+              className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition"
+              aria-label={`Go to page ${totalPages}`}
+            >
+              {totalPages}
+            </button>
+          </>
+        )}
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50 hover:bg-blue-700 transition"
+          aria-label="Next page"
+          aria-disabled={currentPage === totalPages}
+        >
+          Next
+        </button>
+      </nav>
+    );
+  };
+
+  const renderSkeleton = () => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      {Array.from({ length: postsPerPage }).map((_, index) => (
+        <div
+          key={index}
+          className="bg-white shadow-md border rounded-lg p-4 animate-pulse"
+        >
+          <div className="w-full h-48 bg-gray-200 rounded-md mb-3"></div>
+          <div className="h-6 bg-gray-200 rounded w-1/2 mb-1"></div>
+          <div className="h-4 bg-gray-200 rounded w-3/4 mb-1"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+        </div>
+      ))}
+    </div>
+  );
+
+  return (
+    <div className="p-4">
+      <ToastContainer position="top-right" autoClose={3000} />
+      <h2 className="text-2xl font-bold mb-4">Latest Posts</h2>
+
+      {isLoading ? (
+        renderSkeleton()
+      ) : paginatedPosts.length === 0 ? (
+        <p className="text-gray-600">No posts found.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {paginatedPosts.map(post => (
+            <div
+              key={post._id}
+              className="relative bg-white shadow-md border rounded-lg p-4 cursor-pointer hover:shadow-lg transition"
+              onClick={() => navigate(`/product/${post._id}`)}
+              role="article"
+              aria-label={`View details for ${post.adTitle}`}
+            >
+              <img
+                src={post.photos?.[0] ? `${API_URL}/${post.photos[0]}` : 'https://picsum.photos/200/150'}
+                alt={post.adTitle}
+                className="w-full h-48 rounded-md mb-3 object-contain"
+                onError={e => (e.target.src = 'https://picsum.photos/200/150')}
+                loading="lazy"
+              />
+              <button
+                type="button"
+                onClick={e => toggleWishlist(post._id, e)}
+                className="absolute top-2 right-2 bg-white bg-opacity-75 w-9 h-9 rounded-full flex items-center justify-center shadow-sm hover:bg-opacity-100 transition-all"
+                aria-label={wishlist.has(post._id) ? 'Remove from wishlist' : 'Add to wishlist'}
+                title={wishlist.has(post._id) ? 'Remove from Wishlist' : 'Add to Wishlist'}
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 1024 1024"
+                  fill={wishlist.has(post._id) ? '#000' : 'none'}
+                  stroke={wishlist.has(post._id) ? 'none' : 'currentColor'}
+                  strokeWidth="2"
+                  className="transition-all"
+                >
+                  <path d="M830.798 448.659l-318.798 389.915-317.828-388.693c-20.461-27.171-31.263-59.345-31.263-93.033 0-85.566 69.605-155.152 155.152-155.152 72.126 0 132.752 49.552 150.051 116.364h87.777c17.299-66.812 77.905-116.364 150.051-116.364 85.547 0 155.152 69.585 155.152 155.152 0 33.687-10.802 65.862-30.293 91.811zM705.939 124.121c-80.853 0-152.204 41.425-193.939 104.204-41.736-62.778-113.086-104.204-193.939-104.204-128.33 0-232.727 104.378-232.727 232.727 0 50.657 16.194 98.948 47.806 140.897l328.766 402.133h100.189l329.716-403.355c30.662-40.727 46.856-89.018 46.856-139.675 0-128.349-104.398-232.727-232.727-232.727z" />
+                </svg>
+              </button>
+              <h3 className="text-lg font-semibold mb-1">₹{post.price.toLocaleString()}</h3>
+              <p className="text-sm font-medium">{post.adTitle}</p>
+              <p className="text-sm text-gray-600 mb-1 line-clamp-2">{post.description}</p>
+              <p className="text-xs text-gray-400 mt-2">{post.location}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {renderPagination()}
+    </div>
+  );
+};
+
+// Prop Types for Data Validation
+Card.propTypes = {
+  // No props are passed to Card, but defining for future extensibility
+};
+
+export default Card;
+```
+```
+
+---
+
+### **Explanation of Changes**
+
+1. **Removed TypeScript**:
+   - Converted `Card.tsx` to `Card.jsx` by removing TypeScript interfaces (`Post`, `WishlistResponse`, `ToggleWishlistResponse`).
+   - Replaced typed function signatures (e.g., `React.FC`) with standard JavaScript.
+   - Kept the same functionality without type annotations.
+
+2. **Loading Spinner/Skeleton UI**:
+   - Added `isLoading` state initialized to `true`.
+   - Set `isLoading` to `false` in the `finally` block of `loadPosts`.
+   - Created `renderSkeleton` to display 6 skeleton cards with animated pulse effect during API calls.
+   - Rendered skeleton UI when `isLoading` is `true`.
+
+3. **Environment Variables**:
+   - Replaced hardcoded `http://localhost:3000` with `process.env.REACT_APP_API_URL || 'http://localhost:3000'`.
+   - To use this, add to your `.env` file:
+     ```env
+     REACT_APP_API_URL=http://your-api-url
+     ```
+   - Ensure `.env` is included in `.gitignore` for security.
+
+4. **React-Toastify**:
+   - Removed the red alert error state and UI (`error` state and `<div className="bg-red-100...">`).
+   - Added `react-toastify` for errors in `loadPosts`, `loadWishlist`, and `toggleWishlist`.
+   - Added success toasts for wishlist toggles (`Added to wishlist!`, `Removed from wishlist.`).
+   - Included `<ToastContainer />` with `top-right` position and 3-second auto-close.
+
+5. **ARIA Attributes**:
+   - Added `aria-label` to wishlist button (`Add to wishlist` or `Remove from wishlist`).
+   - Added `role="article"` and `aria-label` to post cards for screen reader support.
+   - Added `aria-label`, `aria-current`, and `aria-disabled` to pagination buttons.
+   - Wrapped pagination in `<nav aria-label="Pagination">` for accessibility.
+
+6. **Standardized Wishlist Icons**:
+   - Removed image-based icons (`wish.png`, `wished.png`) and uncommented the SVG from the original code.
+   - Used SVG consistently with `fill` and `stroke` props for wishlist toggle state.
+   - Ensured smooth transitions with `className="transition-all"`.
+
+7. **Debouncing for Search**:
+   - Implemented `useDebounce` hook to debounce search query by 300ms.
+   - Used `debouncedSearch` in the search filtering `useEffect` to reduce unnecessary re-renders.
+   - Reset `currentPage` to 1 when search changes.
+
+8. **Prop Types**:
+   - Added `prop-types` import and defined `Card.propTypes`.
+   - Currently empty since `Card` takes no props, but included for future extensibility (e.g., if you add props like `initialPosts`).
+   - Install `prop-types` if not already present:
+     ```bash
+     npm install prop-types
+     ```
+
+9. **Unit Tests**:
+   - Skipped as per your instruction ("no need").
+   - If you change your mind, I can provide JavaScript-based unit tests using Jest and React Testing Library, tailored to your project’s setup.
+
+---
+
+### **Setup Instructions**
+
+To use the updated `Card.jsx`, ensure the following dependencies are installed:
+
+```bash
+npm install axios react-router-dom @auth0/auth0-react react-toastify prop-types
+```
+
+Add to your `.env` file (or update `.env.local`):
+
+```env
+REACT_APP_API_URL=http://localhost:3000
+```
+
+Ensure your `package.json` includes `react-toastify` styles in your app’s entry point (e.g., `index.js`) if not already imported:
+
+```javascript
+import 'react-toastify/dist/ReactToastify.css';
+```
+
+Verify your backend API endpoints (`/api/loadposts`, `/api/wishlist/ids/${uid}`, `/api/wishlist/toggle/${postId}/${uid}`) match the expected structure. If different, update the URLs in `loadPosts`, `loadWishlist`, and `toggleWishlist`.
+
+---
+
+### **Additional Notes**
+
+- **JavaScript Choice**: The code is now fully JavaScript, avoiding TypeScript to match your project’s constraints. Prop types provide basic validation, but be cautious with data shapes since JavaScript lacks compile-time checks.
+- **Performance**: Added `loading="lazy"` to images for better performance. Consider adding `useMemo` for `filteredPosts` if the post list grows large:
+  ```javascript
+  const filteredPosts = useMemo(
+    () =>
+      debouncedSearch
+        ? posts.filter(post => post.adTitle?.toLowerCase().includes(debouncedSearch))
+        : posts,
+    [posts, debouncedSearch]
+  );
+  ```
+- **Accessibility**: The ARIA attributes improve screen reader support, but test with tools like Lighthouse or WAVE to ensure full compliance.
+- **Error Handling**: Toast notifications are user-friendly, but you may want to customize their styling or duration via `ToastContainer` props:
+  ```javascript
+  <ToastContainer position="top-right" autoClose={5000} theme="colored" />
+  ```
+
+If you need further tweaks (e.g., styling the skeleton UI, adjusting debounce delay, or adding more prop types), or if you want to revisit unit tests later, let me know! Also, if you have another component to improve or compare (e.g., `Sell.jsx`, `Post.jsx`), please share the code or details.

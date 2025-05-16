@@ -123,6 +123,7 @@ const PostCarAdPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
+    const email = localStorage.getItem("email")
     try {
       const data = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
@@ -131,6 +132,9 @@ const PostCarAdPage = () => {
       photos.forEach((file) => {
         data.append('photos', file);
       });
+
+      data.append('email',email)
+
       const res = await fetch('http://localhost:3000/api/posts', {
         method: 'POST',
         body: data

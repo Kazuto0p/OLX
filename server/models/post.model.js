@@ -14,6 +14,8 @@ const postSchema = new mongoose.Schema({
   phone: { type: String, required: false, trim: true },
   photos: { type: [String], default: [] },
   createdAt: { type: Date, default: Date.now },
+
+  email: { type: String, required: true },
 });
 
 export default mongoose.model('Post', postSchema);

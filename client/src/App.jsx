@@ -16,9 +16,12 @@ import SellLaptop from './Pages/Sell_Post/subpages/SellLaptop';
 import ProductPreview from './Pages/Details/ProductPreview';
 import WishList from './Pages/WishList/WishList';
 
+import Profile from './Components/auth/profile/Profile';
+import EditProfile from './Pages/EditProfile/EditProfile';
 const App = () => {
   return (
     <div>
+      
       <BrowserRouter>
         {/* <AuthRestore /> */}
         <Routes>
@@ -88,6 +91,8 @@ const App = () => {
               </>
             }
           />
+          <Route path='/prof' element={<><Profile /></>} />
+          <Route path='/edit' element={<> <Navbar /><EditProfile/> <Footer/></>} />
           <Route path='/wishlist' element={<> <Navbar /> <WishList /> <Footer/></>} />
           {/* Keep commented route for reference */}
           {/* <Route path="/cars" element={<><Nav2 /><Carr /></>} /> */}

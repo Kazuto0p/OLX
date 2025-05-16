@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import LoginButton from "../auth/login/Login";
 import LogoutButton from "../auth/logout/Logout";
+// import EditProfile from "../../Pages/EditProfile/EditProfile";
 import axios from "axios";
 
 const Navbar = () => {
@@ -14,6 +15,8 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+
+  const [profilePic,setProfilePic] = useState('')
 
   useEffect(() => {
     const query = searchParams.get("search") || "";
@@ -29,10 +32,22 @@ const Navbar = () => {
       console.log(res.data)
       localStorage.setItem("id",res.data._id)
 
+      const email2 = localStorage.getItem('email')
+
+
+      const res2 = await axios.get("http://localhost:3000/api/loadProfile",{params:{email}})
+
+      // console.log(res2.data.profilePic,"rwerwerwe")
+
+      setProfilePic(res2.data.profilePic)
+
     } catch (error) {
       console.log(error)
     }
   }
+
+
+  
 
   useEffect(() => {
     if (isAuthenticated && user?.email) {
@@ -166,7 +181,7 @@ const Navbar = () => {
 
           <div className="profile-section" onClick={toggleProfileDropdown}>
             {isAuthenticated ? (
-              <img src={user?.picture || "src/assets/react.svg"} alt="Profile" className="profile-pic" />
+              <img src={ `http://localhost:3000${profilePic}`} alt="Profile" className="profile-pic" />
             ) : (
               <LoginButton />
             )}
@@ -178,14 +193,24 @@ const Navbar = () => {
                     <div className="profile-section">
                       {isAuthenticated ? (
                         <>
-                          <img src={user?.picture || "src/assets/react.svg"} alt="Profile" className="profile-pic" />
+                          <img src={user?.picture || "src/assets/react.svg" } alt="Profile" className="profile-pic" />
                           <span className="username truncate">{user.name}</span>
                         </>
                       ) : (
                         <span className="username">Guest</span>
                       )}
                     </div>
-                    <button id="vep">View and edit profile</button>
+                    {/* <button id="vep">View and edit profile</button> */}
+                  </div>
+                </div>
+                
+                <div className="profile-section1">
+                  <div className="BOARD">
+                  <div className="bt1" style={{ display: "flex", justifyContent: "center", marginTop: "4%" }}>
+
+                      <button id="vep" onClick={() => navigate("/edit")}>View and edit profile</button>
+                    </div>
+                  
                   </div>
                 </div>
 

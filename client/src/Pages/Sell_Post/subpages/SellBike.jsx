@@ -92,7 +92,8 @@ const SellBike = () => {
   const handleSubmit = async () => {
     setError('');
     setSuccess('');
-
+    const email = localStorage.getItem("email")
+    console.log(email)
     const fullLocation = `${location.neighborhood}, ${location.city}, ${location.state}`;
     const owners = formData.noOfOwners ? `${formData.noOfOwners}th` : '';
     const formDataToSend = new FormData();
@@ -107,7 +108,7 @@ const SellBike = () => {
     formDataToSend.append('price', formData.price);
     formDataToSend.append('location', fullLocation);
     formDataToSend.append('phone', formData.phone);
-
+    formDataToSend.append('email',email)
     const validImages = images.filter((img) => img !== null);
     validImages.forEach((image) => {
       formDataToSend.append('photos', image);

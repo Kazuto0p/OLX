@@ -15,21 +15,58 @@ const Category = () => {
 
   const postsPerPage = 6;
   const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
-
   const loadPosts = async () => {
     try {
-      const category = searchParams.get("category") || "";
+      const categoryParam = searchParams.get("category")?.trim().toLowerCase() || "";
+      console.log(" Category from searchParams:", categoryParam);
+  
+      // Optional: map aliases like "bikes" => "bike", etc.
+      const categoryAliases = {
+        bikes: "bike",
+        cars: "car",
+        mobiles: "mobile",
+        laptops: "laptop",
+      };
+      const normalizedCategory = categoryAliases[categoryParam] || categoryParam;
+  
       const { data } = await axios.get("http://localhost:3000/api/loadposts", {
-        params: { category },
+        params: { category: normalizedCategory },
       });
-      setPosts(data.data);
-      setFilteredPosts(data.data.filter(ad => ad.category !== "Bike"));
+  
+      const fetchedPosts = Array.isArray(data.data) ? data.data : [];
+      console.log(" Fetched posts:", fetchedPosts);
+      console.log(" Unique categories in posts:", [
+        ...new Set(fetchedPosts.map((post) => post.category)),
+      ]);
+  
+      // Optional: log structure of first post
+      if (fetchedPosts.length > 0) {
+        console.log(" Sample post object structure:", fetchedPosts[0]);
+      }
+  
+      setPosts(fetchedPosts);
+  
+      if (normalizedCategory) {
+        const filtered = fetchedPosts.filter(
+          (ad) => ad.category?.toLowerCase().trim() === normalizedCategory
+        );
+  
+        console.log(` Filtered posts for "${categoryParam}":`, filtered);
+        setFilteredPosts(filtered);
+  
+        if (filtered.length === 0) {
+          setError(`No posts found for category: ${categoryParam}`);
+        }
+      } else {
+        console.log(" No category specified, showing all posts");
+        setFilteredPosts(fetchedPosts);
+      }
     } catch (err) {
-      console.error("Error loading posts:", err);
+      console.error(" Error loading posts:", err);
       setError("Failed to load posts.");
     }
   };
-
+  
   const loadWishlist = async () => {
     const uid = localStorage.getItem("id");
     try {

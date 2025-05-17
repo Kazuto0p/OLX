@@ -174,7 +174,8 @@ const Navbar = () => {
 
           <div className="profile-section" onClick={toggleProfileDropdown}>
             {isAuthenticated ? (
-              <img src={`http://localhost:3000${profilePic}`} alt="Profile" className="profile-pic" />
+              // <img src={`http://localhost:3000${profilePic}`} alt="Profile" className="profile-pic" />
+              <img src={user?.picture || "src/assets/react.svg"} alt="Profile" className="profile-pic" />
             ) :  (
               <LoginButton />
             )}

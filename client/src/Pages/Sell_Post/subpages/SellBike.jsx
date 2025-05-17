@@ -5,11 +5,11 @@ import axios from 'axios';
 const SellBike = () => {
   const [formData, setFormData] = useState({
     brand: '',
-    bikeName: '',
+ 
     year: '',
     fuel: '',
     transmission: '',
-    noOfOwners: '',
+    owners: '',
     kmDriven: '',
     adTitle: '',
     description: '',
@@ -24,6 +24,7 @@ const SellBike = () => {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false); // New state for popup
 
   const navigate = useNavigate();
 
@@ -44,7 +45,7 @@ const SellBike = () => {
     },
   ];
 
-  const bikeBrands = ['BMW', 'Ducati', 'Bentley','Yamaha','Extra','Honda','Kawasaki','Hero','KTM'];
+  const bikeBrands = ['BMW', 'Ducati', 'Bentley', 'Yamaha', 'Extra', 'Honda', 'Kawasaki', 'Hero', 'KTM'];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -92,8 +93,10 @@ const SellBike = () => {
   const handleSubmit = async () => {
     setError('');
     setSuccess('');
-    const email = localStorage.getItem("email")
-    console.log(email)
+    setShowSuccessPopup(false); // Ensure popup is closed initially
+    const category = "Bike";
+    const email = localStorage.getItem("email");
+    console.log(email);
     const fullLocation = `${location.neighborhood}, ${location.city}, ${location.state}`;
     const owners = formData.noOfOwners ? `${formData.noOfOwners}th` : '';
     const formDataToSend = new FormData();
@@ -108,7 +111,8 @@ const SellBike = () => {
     formDataToSend.append('price', formData.price);
     formDataToSend.append('location', fullLocation);
     formDataToSend.append('phone', formData.phone);
-    formDataToSend.append('email',email)
+    formDataToSend.append('email', email);
+    formDataToSend.append('category', category);
     const validImages = images.filter((img) => img !== null);
     validImages.forEach((image) => {
       formDataToSend.append('photos', image);
@@ -124,10 +128,32 @@ const SellBike = () => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setSuccess(response.data.message);
-      setTimeout(() => navigate('/'), 2000);
+      setShowSuccessPopup(true); // Show popup on success
+      // Reset form after success
+      setFormData({
+        brand: '',
+        bikeName: '',
+        year: '',
+        fuel: '',
+        transmission: '',
+        noOfOwners: '',
+        kmDriven: '',
+        adTitle: '',
+        description: '',
+        price: '',
+        phone: '',
+      });
+      setImages(Array(20).fill(null));
+      setLocation({ state: '', city: '', neighborhood: '' });
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to post ad.');
     }
+  };
+
+  const handlePopupClose = () => {
+    setShowSuccessPopup(false); // Close popup
+    setSuccess(''); // Clear success message
+    navigate('/'); // Navigate to home
   };
 
   return (
@@ -140,9 +166,9 @@ const SellBike = () => {
           ←
         </button>
         <h1 className="text-lg font-bold uppercase mb-4 text-center">Sell Your Bike</h1>
-        <div className="bg-white rounded-lg shadow-md p-4">
+        <div className="bg-white roundup-lg shadow-md p-4">
           {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
-          {success && <p className="text-green-500 text-sm mb-2">{success}</p>}
+          {success && !showSuccessPopup && <p className="text-green-500 text-sm mb-2">{success}</p>}
           <div className="mb-4">
             <h2 className="text-base font-bold uppercase p-2">Category</h2>
             <div className="flex justify-between p-2">
@@ -399,6 +425,23 @@ const SellBike = () => {
             </button>
           </div>
         </div>
+
+        {showSuccessPopup && (
+          <div className="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">Ad Posted Successfully</h2>
+              <p className="text-sm text-gray-700 mb-4">{success}</p>
+              <div className="flex justify-end">
+                <button
+                  onClick={handlePopupClose}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  OK
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -188,9 +188,9 @@ export async function addPost(req, res) {
     
 
     const {
-      adTitle, description, price, location, userId,
+      adTitle, description, price, location,
       phone = '', brand = '', year,
-      fuel = '', transmission = '', kmDriven, owners = '',email
+      fuel = '', transmission = '', kmDriven, owners = '',email,category
     } = req.body;
 
     console.log(email);
@@ -216,7 +216,7 @@ export async function addPost(req, res) {
       description: description.trim(),
       price: Number(price),
       location: location.trim(),
-      userId,
+
       phone: phone.trim(),
       brand: brand.trim(),
       year: year ? Number(year) : undefined,
@@ -225,6 +225,7 @@ export async function addPost(req, res) {
       kmDriven: kmDriven ? Number(kmDriven) : undefined,
       owners: owners,
       photos,
+      category,
       email
     });
 

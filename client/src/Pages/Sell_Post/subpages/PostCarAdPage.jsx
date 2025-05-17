@@ -119,38 +119,71 @@ const PostCarAdPage = () => {
   const removePhoto = useCallback(idx => {
     setPhotos(prev => prev.filter((_, i) => i !== idx));
   }, []);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-    const email = localStorage.getItem("email")
+  
+    const category = "Car";
+    const email = localStorage.getItem("email");
+  
     try {
+      // Validate inputs
+      if (!email) {
+        throw new Error('Email not found in localStorage');
+      }
+      if (Object.keys(formData).length === 0) {
+        throw new Error('Form data is empty');
+      }
+  
+      // Create FormData
       const data = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
         data.append(key, value);
       });
-      photos.forEach((file) => {
-        data.append('photos', file);
+      photos.forEach((file, index) => {
+        if (file instanceof File) {
+          data.append('photos', file);
+        } else {
+          console.warn(`Invalid file at index ${index}:`, file);
+        }
       });
-
-      data.append('email',email)
-
+      data.append('email', email);
+      data.append('category', category);
+  
+      // Debug: Log FormData contents
+      console.log('FormData contents:');
+      for (let [key, value] of data.entries()) {
+        console.log(`${key}:`, value);
+      }
+  
+      // Debug: Log before sending request
+      console.log('Sending request to http://localhost:3000/api/posts...');
+  
+      // Make the POST request
       const res = await fetch('http://localhost:3000/api/posts', {
         method: 'POST',
-        body: data
+        body: data,
       });
-      if (!res.ok) throw new Error('Network response was not ok');
+  
+      // Check response
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Network response was not ok: ${res.status} - ${errorText}`);
+      }
+  
       const result = await res.json();
       console.log('Success:', result);
+  
+      // Reset form
       setFormData(initial);
       setPhotos([]);
     } catch (err) {
       console.error('Error submitting form:', err);
+      alert(`Failed to submit form: ${err.message}`);
     } finally {
       setSubmitting(false);
     }
   };
-
   return (
     <form onSubmit={handleSubmit} className="p-6 bg-gray-100 min-h-screen">
       <div className="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow-lg">

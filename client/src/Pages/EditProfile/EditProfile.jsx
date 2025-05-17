@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import axios from 'axios';
@@ -12,22 +11,18 @@ const EditProfile = () => {
     email: '',
     about: '',
   });
-  const [view, setView] = useState('profile');
   const [error, setError] = useState(null);
 
-  // Backend API base URL
-  const API_URL = 'http://localhost:3000/api'; // Adjust to your backend URL
+  const API_URL = 'http://localhost:3000/api';
 
-  // Fetch or create user when authenticated
   useEffect(() => {
     const fetchUser = async () => {
       if (isAuthenticated && user) {
         try {
-          // Call /signin to create or retrieve user
-          const response = await axios.post(`http://localhost:3000/api/signin`, {
+          const response = await axios.post(`${API_URL}/signin`, {
             username: user.name,
             email: user.email,
-            phone:user.phone
+            phone: user.phone,
           });
           const dbUser = response.data;
           setLocalUser({
@@ -40,7 +35,6 @@ const EditProfile = () => {
         } catch (err) {
           console.error('Error fetching user:', err);
           setError('Failed to load user data');
-          // Fallback to Auth0 data
           setLocalUser({
             profilePic: user.picture || '',
             username: user.name || '',
@@ -52,7 +46,6 @@ const EditProfile = () => {
       }
     };
 
-    console.log(localUser.profilePic,"fsdfsd")
     fetchUser();
   }, [isAuthenticated, user]);
 
@@ -98,150 +91,102 @@ const EditProfile = () => {
         about: response.data.about,
       });
       alert('Profile updated!');
-      setView('profile');
     } catch (err) {
       console.error('Error updating profile:', err);
       setError('Failed to update profile');
     }
   };
 
-  if (isLoading) return <div>Loading...</div>;
-
-  const ProfileView = () => (
-    <div className="p-6 bg-white rounded-xl shadow-md">
-      <h2 className="text-2xl font-bold mb-4">Profile</h2>
-      {error && <p className="text-red-500">{error}</p>}
-      <div className="space-y-4">
-        <div className="flex items-center space-x-4">
-          <img
-            src={
-
-                `http://localhost:3000${localUser.profilePic}`
-            }
-            alt="Profile"
-            className="w-20 h-20 rounded-full object-cover border"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium">Username</label>
-          <p className="mt-1 p-2 bg-gray-100 rounded">{localUser.username}</p>
-        </div>
-        <div>
-          <label className="block text-sm font-medium">Phone</label>
-          <p className="mt-1 p-2 bg-gray-100 rounded">{localUser.phone}</p>
-        </div>
-        <div>
-          <label className="block text-sm font-medium">Email</label>
-          <p className="mt-1 p-2 bg-gray-100 rounded">{localUser.email}</p>
-        </div>
-        <div>
-          <label className="block text-sm font-medium">About</label>
-          <p className="mt-1 p-2 bg-gray-100 rounded">{localUser.about}</p>
-        </div>
-      </div>
-    </div>
-  );
-
-  const EditView = () => (
-    <div className="p-6 bg-white rounded-xl shadow-md">
-      <h2 className="text-2xl font-bold mb-4">Edit Profile</h2>
-      {error && <p className="text-red-500">{error}</p>}
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="flex items-center space-x-4">
-          <img
-            src={
-              localUser.profilePic instanceof File
-                ? URL.createObjectURL(localUser.profilePic)
-                : localUser.profilePic || 'https://via.placeholder.com/150'
-            }
-            alt="Profile"
-            className="w-20 h-20 rounded-full object-cover border"
-          />
-          <input type="file" accept="image/*" onChange={handleFileChange} className="text-sm" />
-        </div>
-        <div>
-          <label className="block text-sm font-medium">Username</label>
-          <input
-            type="text"
-            name="username"
-            value={localUser.username}
-            onChange={handleChange}
-            className="mt-1 w-full p-2 border rounded"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium">Phone</label>
-          <input
-            type="text"
-            name="phone"
-            value={localUser.phone}
-            onChange={handleChange}
-            className="mt-1 w-full p-2 border rounded"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium">Email</label>
-          <input
-            type="email"
-            name="email"
-            value={localUser.email}
-            onChange={handleChange}
-            className="mt-1 w-full p-2 border rounded"
-            disabled // Prevent email changes as it's tied to Auth0
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium">About</label>
-          <textarea
-            name="about"
-            value={localUser.about}
-            onChange={handleChange}
-            className="mt-1 w-full p-2 border rounded"
-            rows="4"
-          />
-        </div>
-        <button
-          type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          Save Changes
-        </button>
-      </form>
-    </div>
-  );
+  if (isLoading) return <div className="text-center py-10">Loading...</div>;
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      <div className="w-64 bg-white shadow-md">
-        <div className="p-4">
-          <h3 className="text-lg font-semibold">Menu</h3>
-          <ul className="mt-4 space-y-2">
-            <li>
-              <button
-                onClick={() => setView('profile')}
-                className={`w-full text-left p-2 rounded ${
-                  view === 'profile' ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'
-                }`}
-              >
-                Profile
-              </button>
-            </li>
-            <li>
-              <button
-                onClick={() => setView('edit')}
-                className={`w-full text-left p-2 rounded ${
-                  view === 'edit' ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'
-                }`}
-              >
-                Edit
-              </button>
-            </li>
-          </ul>
+    <div className="max-w-7xl mx-auto px-4 py-10">
+      <div className="flex flex-col sm:flex-row items-start justify-between bg-white shadow-md p-6 rounded-md gap-6">
+        {/* Left side: profile preview */}
+        <div className="flex flex-col items-center sm:items-start gap-4 sm:w-1/2">
+          <div>
+            <img
+              src={
+                localUser.profilePic instanceof File
+                  ? URL.createObjectURL(localUser.profilePic)
+                  : localUser.profilePic?.startsWith('http')
+                  ? localUser.profilePic
+                  : `http://localhost:3000${localUser.profilePic}`
+              }
+              alt="Profile"
+              className="rounded-full w-20 h-20 object-cover"
+            />
+          </div>
+          <div className="text-center sm:text-left w-full">
+            <h2 className="text-xl font-semibold">{localUser.username}</h2>
+            <p className="text-gray-600 text-sm mt-1">{localUser.email}</p>
+            <p className="text-gray-600 text-sm">📱 {localUser.phone || 'No phone added'}</p>
+            <p className="text-gray-600 text-sm mt-1">
+              {localUser.about || 'No bio yet'}
+            </p>
+          </div>
         </div>
-      </div>
-      <div className="flex-1 p-6">
-        <div className="max-w-xl mx-auto">
-          {view === 'profile' ? <ProfileView /> : <EditView />}
+
+        {/* Right side: edit form */}
+        <div className="flex-1 w-full">
+          <h2 className="text-xl font-semibold mb-4">Edit Profile</h2>
+          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="flex items-center gap-4">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="text-sm text-gray-600"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-600">Username</label>
+              <input
+                type="text"
+                name="username"
+                value={localUser.username}
+                onChange={handleChange}
+                className="mt-1 w-full p-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-800"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-600">Phone</label>
+              <input
+                type="text"
+                name="phone"
+                value={localUser.phone}
+                onChange={handleChange}
+                className="mt-1 w-full p-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-800"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-600">Email</label>
+              <input
+                type="email"
+                name="email"
+                value={localUser.email}
+                disabled
+                className="mt-1 w-full p-2 border rounded text-sm bg-gray-100 cursor-not-allowed"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-600">About</label>
+              <textarea
+                name="about"
+                value={localUser.about}
+                onChange={handleChange}
+                rows="4"
+                className="mt-1 w-full p-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-800"
+              />
+            </div>
+            <button
+              type="submit"
+              className="bg-blue-800 text-white font-bold py-2 px-6 rounded hover:bg-white hover:text-blue-800 border hover:border-blue-800 transition"
+            >
+              Save Changes
+            </button>
+          </form>
         </div>
       </div>
     </div>

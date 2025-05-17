@@ -1,6 +1,6 @@
 import express from "express";
 import upload from "../multer/multer.config.js";
-import { addPost, getPostById, loadpost, updateUser, userlog,loadProfile,offer } from "../controller/post.js";
+import { addPost, getPostById, loadpost, updateUser, userlog,loadProfile,offer, loadUserPosts, } from "../controller/post.js";
 import {
   getWishlist,
   getWishlistIds,
@@ -26,7 +26,8 @@ router.delete('/wishlist/remove/:postId', removeFromWishlist);
 router.post('/wishlist/toggle/:postId/:uid', toggleWishlist);
 
 router.get('/loadProfile',loadProfile)
-
+// router.get('/loadpostByCategory',loadpostByCategory)
 router.get("/offer",offer)
+router.get('/loadUserPosts', loadUserPosts);
 
 export default router;

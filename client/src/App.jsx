@@ -18,6 +18,9 @@ import WishList from './Pages/WishList/WishList';
 
 import Profile from './Components/auth/profile/Profile';
 import EditProfile from './Pages/EditProfile/EditProfile';
+// import Category from './Components/Category/Category';
+import Category from './Components/Category/Category';
+import Myads from './Pages/myads/Myads';
 const App = () => {
   return (
     <div>
@@ -94,6 +97,8 @@ const App = () => {
           <Route path='/prof' element={<><Profile /></>} />
           <Route path='/edit' element={<> <Navbar /><EditProfile/> <Footer/></>} />
           <Route path='/wishlist' element={<> <Navbar /> <WishList /> <Footer/></>} />
+          <Route path="/category" element={<> <Navbar /> <Category /> <Footer/></>} />
+          <Route path="/myads" element={<> <Navbar /> <Myads /> <Footer/></>} />
           {/* Keep commented route for reference */}
           {/* <Route path="/cars" element={<><Nav2 /><Carr /></>} /> */}
         </Routes>

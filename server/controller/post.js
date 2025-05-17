@@ -247,6 +247,33 @@ export async function loadpost(req, res) {
   }
 }
 
+
+// controllers/postController.js
+// post.js
+// export async function loadpostByCategory(req, res) {
+//   try {
+//     const { category } = req.query;
+//     console.log("Received category:", category);
+//     if (!category) {
+//       return res.status(200).json({ message: "No category provided", data: [] });
+//     }
+//     // Normalize 'cars' to 'car' for consistency with database
+//     const normalizedCategory = category.toLowerCase() === "cars" ? "car" : category.toLowerCase();
+//     const filter = { category: { $regex: new RegExp(`^${normalizedCategory}$`, "i") } };
+//     console.log("Filter:", filter);
+//     const posts = await Post.find(filter).sort({ createdAt: -1 });
+//     console.log("Found posts:", posts);
+//     res.status(200).json({
+//       message: posts.length ? "Success" : `No posts found for category '${category}'`,
+//       data: posts
+//     });
+//   } catch (err) {
+//     console.error("loadpostByCategory error:", err);
+//     res.status(500).json({ message: "Server error", error: err.message });
+//   }
+// }
+
+
 // Get single post by ID
 export async function getPostById(req, res) {
   console.log("inside load post");
@@ -540,3 +567,18 @@ export async function offer(req,res){
   console.log("Message sent: %s", info2.messageId);
   
 }
+
+
+export const loadUserPosts = async (req, res) => {
+  try {
+    const { email } = req.query;
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+    const posts = await Post.find({ email }).sort({ createdAt: -1 });
+    res.status(200).json({ data: posts });
+  } catch (error) {
+    console.error('Error loading user posts:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
